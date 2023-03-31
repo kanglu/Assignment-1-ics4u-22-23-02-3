@@ -1,4 +1,5 @@
 const data = loadJSON("./DO_NOT_TOUCH/data.json");
+// const data = loadJSON("./small_data.json");
 
 const DBKEYS = {
   ACTOR_NAME: "actorName",
@@ -10,9 +11,11 @@ const DBKEYS = {
   FILM_ID: "filmID",
 };
 
-class MergeSort {
+let INDEXES = {};
+
+class Index {
   constructor(arr) {
-    if (!Array.isArray(arr) || !arr.length) {
+    if (!Array.isArray(arr)) {
       return;
     }
 
@@ -63,15 +66,6 @@ class MergeSort {
 
     repl = b + i + j;
 
-    // Using splice seem to have stack size limitations
-    //
-    // if (i < leftLen) {
-    //   this.iarr.splice(repl, leftLen - i, ...orig.slice(i, leftLen));
-    // }
-    // if (j < rightLen) {
-    //   this.iarr.splice(repl, rightLen - j, ...orig.slice(leftLen + j));
-    // }
-
     for (let k = i; k < leftLen; k++) {
       this.iarr[repl] = orig[k];
       repl++;
@@ -116,7 +110,68 @@ class MergeSort {
 
     segments.reduceRight(
       function (_, seg) {
-        this.merge(seg.b, seg.m, seg.e);
+        // The if statements handle special optimizations
+        if (this.arr[this.iarr[seg.m - 1]] < this.arr[this.iarr[seg.m]]) {
+          // If all the values to the left of middle is less than the ones
+          // to the right then there is nothing to be done.
+
+          return;
+        } else if (seg.e - seg.b == 2) {
+          // Simple swap for only a single element in each segment
+          if (this.arr[this.iarr[seg.b]] > this.arr[this.iarr[seg.m]]) {
+            let t = this.iarr[seg.b];
+            this.iarr[seg.b] = this.iarr[seg.m];
+            this.iarr[seg.m] = t;
+          }
+        } else if (seg.e - seg.b == 3) {
+          // Manual handling of a 3 elements segment
+          let b1 = seg.b + 1;
+          let b2 = seg.b + 2;
+
+          if (this.arr[this.iarr[seg.b]] > this.arr[this.iarr[b2]]) {
+            let t = this.iarr[seg.b];
+            this.iarr[seg.b] = this.iarr[b2];
+            this.iarr[b2] = t;
+          }
+          if (this.arr[this.iarr[seg.b]] > this.arr[this.iarr[b1]]) {
+            let t = this.iarr[seg.b];
+            this.iarr[seg.b] = this.iarr[b1];
+            this.iarr[b1] = t;
+          }
+          if (this.arr[this.iarr[b1]] > this.arr[this.iarr[b2]]) {
+            let t = this.iarr[b1];
+            this.iarr[b1] = this.iarr[b2];
+            this.iarr[b2] = t;
+          }
+        } else if (seg.e - seg.b == 4) {
+          // Manual handling of a 4 elements segment
+          let b1 = seg.b + 1;
+          let b2 = seg.b + 2;
+          let b3 = seg.b + 3;
+
+          if (this.arr[this.iarr[seg.b]] > this.arr[this.iarr[b3]]) {
+            let t = this.iarr[seg.b];
+            this.iarr[seg.b] = this.iarr[b3];
+            this.iarr[b3] = t;
+          }
+          if (this.arr[this.iarr[seg.b]] > this.arr[this.iarr[b1]]) {
+            let t = this.iarr[seg.b];
+            this.iarr[seg.b] = this.iarr[b1];
+            this.iarr[b1] = t;
+          }
+          if (this.arr[this.iarr[b1]] > this.arr[this.iarr[b2]]) {
+            let t = this.iarr[b1];
+            this.iarr[b1] = this.iarr[b2];
+            this.iarr[b2] = t;
+          }
+          if (this.arr[this.iarr[b2]] > this.arr[this.iarr[b3]]) {
+            let t = this.iarr[b2];
+            this.iarr[b2] = this.iarr[b3];
+            this.iarr[b3] = t;
+          }
+        } else {
+          this.merge(seg.b, seg.m, seg.e);
+        }
       }.bind(this)
     );
   }
@@ -128,15 +183,23 @@ class MergeSort {
   }
 }
 
+let tt = 0;
 Object.keys(DBKEYS).forEach(function (key) {
   console.log(`==>Sorting for ${key}`);
   let testArray = data[DBKEYS[key]];
-  let sorter = new MergeSort(testArray);
-  console.time("a");
-  sorter.sort();
-  console.timeEnd("a");
+  let index = new Index(testArray);
+  INDEXES[key] = index;
 
-  console.time("builtin");
-  testArray.sort();
-  console.timeEnd("builtin");
+  let pst = performance.now();
+  index.sort();
+  let pet = performance.now();
+  let d = pet - pst;
+  tt += d;
+  console.log(`merge time (ms): ${d}`);
+
+  // pst = performance.now();
+  // testArray.sort();
+  // pet = performance.now();
+  // console.log(`built-in time (ms): ${pet - pst}`);
 });
+console.log(`total time (ms): ${tt}`);
