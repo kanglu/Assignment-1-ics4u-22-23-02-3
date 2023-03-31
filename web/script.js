@@ -1,5 +1,14 @@
-const data = loadJSON("./DO_NOT_TOUCH/data.json"); //Don't delete this line. All your data is here. It does take a few seconds for Replit to load the data because it's so large.
-console.log(data);
+const data = loadJSON("./DO_NOT_TOUCH/data.json");
+
+const DBKEYS = {
+  ACTOR_NAME: "actorName",
+  ACTOR_ID: "actorID",
+  FILM_NAME: "filmName",
+  YEAR_RELEASED: "yearReleased",
+  VOTES: "votes",
+  RATING: "rating",
+  FILM_ID: "filmID",
+};
 
 class MergeSort {
   constructor(arr) {
@@ -11,9 +20,14 @@ class MergeSort {
     this.arr = arr;
 
     // This is the index array used for sorting
-    this.iarr = Array.apply(null, Array(arr.length)).map((_, idx) => {
-      return idx;
-    });
+    this.iarr = new Array(arr.length);
+    for (let index = 0; index < arr.length; index++) {
+      this.iarr[index] = index;
+    }
+
+    // this.iarr = Array.apply(null, Array(arr.length)).map((_, idx) => {
+    //   return idx;
+    // });
   }
 
   // Optionally set the input array after construction
@@ -53,23 +67,23 @@ class MergeSort {
 
     repl = b + i + j;
 
-    if (i < leftLen) {
-      this.iarr.splice(repl, leftLen - i, ...orig.slice(i, leftLen));
-    }
-    if (j < rightLen) {
-      this.iarr.splice(repl, rightLen - j, ...orig.slice(leftLen + j));
-    }
-
-    // Use for instead of splice (seems to be slower)
+    // Using splice seem to have stack size limitations
     //
-    // for (let k = i; k < leftLen; k++) {
-    //   this.iarr[repl] = orig[k];
-    //   repl++;
+    // if (i < leftLen) {
+    //   this.iarr.splice(repl, leftLen - i, ...orig.slice(i, leftLen));
     // }
-    // for (let k = j; k < rightLen; k++) {
-    //   this.iarr[repl] = orig[leftLen + k];
-    //   repl++;
+    // if (j < rightLen) {
+    //   this.iarr.splice(repl, rightLen - j, ...orig.slice(leftLen + j));
     // }
+
+    for (let k = i; k < leftLen; k++) {
+      this.iarr[repl] = orig[k];
+      repl++;
+    }
+    for (let k = j; k < rightLen; k++) {
+      this.iarr[repl] = orig[leftLen + k];
+      repl++;
+    }
   }
 
   sort() {
@@ -118,14 +132,19 @@ class MergeSort {
   }
 }
 
-const sorter = new MergeSort(testArray);
-let start = performance.now();
-sorter.sort();
-let end = performance.now();
-console.log(`Execution time: ${end - start} ms`);
-sorter.print();
+Object.keys(DBKEYS).forEach(function (key) {
+  console.log(`==>Sorting for ${key}`);
+  let testArray = data[DBKEYS[key]];
+  let sorter = new MergeSort(testArray);
+  let start = performance.now();
+  sorter.sort();
+  let end = performance.now();
+  console.log(`Execution time: ${end - start} ms`);
 
-start = performance.now();
-testArray.sort();
-end = performance.now();
-console.log(`Built-in Execution time: ${end - start} ms`);
+  start = performance.now();
+  testArray.sort();
+  end = performance.now();
+  console.log(`Built-in Execution time: ${end - start} ms`);
+
+  sorter = null;
+});
