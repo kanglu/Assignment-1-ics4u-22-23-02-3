@@ -27,17 +27,14 @@ class Index {
     for (let index = 0; index < arr.length; index++) {
       this.iarr[index] = index;
     }
-  }
 
-  // Optionally set the input array after construction
-  setArr(arr) {
-    this.arr = arr;
+    this.sort();
   }
 
   // Use map to perform a function for every element in the sorted array
-  map(func) {
+  map(func, start = 0, end = this.iarr.length) {
     if (func) {
-      this.iarr.forEach(
+      this.iarr.slice(start, end).forEach(
         function (item, idx) {
           func(this.arr[item], idx);
         }.bind(this)
@@ -176,6 +173,102 @@ class Index {
     );
   }
 
+  getRangeOf(term) {
+    let to = -1;
+    let from = this.getFirstIndexOf(term);
+    if (from >= 0) {
+      for (let i = from; i < this.iarr.length; i++) {
+        to = i;
+        if (this.nth(i) != term) {
+          break;
+        }
+      }
+    }
+    if (to >= 0) {
+      return [from, to];
+    } else {
+      return [];
+    }
+  }
+
+  getFirstIndexOf(term) {
+    let min = 0;
+    let max = this.arr.length;
+    let mid = Math.trunc((max + min) / 2);
+    let r = -1;
+    while (true) {
+      let v = this.nth(mid);
+      if (!v) {
+        break;
+      }
+      let found = false;
+      if (v == term) {
+        // walk back to get the first instance of possible duplicates
+        for (let i = mid; i >= 0; i--) {
+          if (this.nth(i) != term) {
+            found = true;
+            break;
+          } else {
+            r = i;
+          }
+        }
+        if (!found) {
+          r = 0;
+        }
+        break;
+      } else if (v > term) {
+        max = mid;
+        mid = Math.trunc((mid + min) / 2);
+        if (mid == max) {
+          break;
+        }
+      } else if (v < term) {
+        min = mid;
+        mid = Math.trunc((max + mid) / 2);
+        if (mid == min) {
+          break;
+        }
+      }
+    }
+    return r;
+  }
+
+  nth(idx) {
+    if (Number.isInteger(idx) && idx >= 0 && idx <= this.iarr.length) {
+      return this.arr[this.iarr[idx]];
+    }
+    return "";
+  }
+
+  rangeValues(from, to) {
+    let start = from;
+    let end = to;
+    if (Array.isArray(from) && from.length == 2) {
+      start = from[0];
+      end = from[1];
+    }
+    if (
+      Number.isInteger(start) &&
+      Number.isInteger(end) &&
+      start >= 0 &&
+      end >= 0 &&
+      start <= end
+    ) {
+      if (end == start) {
+        return [this.nth(start)];
+      } else {
+        let r = new Array(end - start);
+        this.iarr.slice(start, end).forEach(
+          function (e, i) {
+            r[i] = this.arr[e];
+          }.bind(this)
+        );
+        return r;
+      }
+    }
+    return [];
+  }
+
   print() {
     this.map(function (item, idx) {
       console.log(`${idx}: ${item}`);
@@ -187,12 +280,13 @@ let tt = 0;
 Object.keys(DBKEYS).forEach(function (key) {
   console.log(`==>Sorting for ${key}`);
   let testArray = data[DBKEYS[key]];
-  let index = new Index(testArray);
-  INDEXES[key] = index;
 
   let pst = performance.now();
-  index.sort();
+  let index = new Index(testArray);
   let pet = performance.now();
+
+  INDEXES[key] = index;
+
   let d = pet - pst;
   tt += d;
   console.log(`merge time (ms): ${d}`);
