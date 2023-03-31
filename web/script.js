@@ -24,10 +24,6 @@ class MergeSort {
     for (let index = 0; index < arr.length; index++) {
       this.iarr[index] = index;
     }
-
-    // this.iarr = Array.apply(null, Array(arr.length)).map((_, idx) => {
-    //   return idx;
-    // });
   }
 
   // Optionally set the input array after construction
@@ -136,15 +132,11 @@ Object.keys(DBKEYS).forEach(function (key) {
   console.log(`==>Sorting for ${key}`);
   let testArray = data[DBKEYS[key]];
   let sorter = new MergeSort(testArray);
-  let start = performance.now();
+  console.time("a");
   sorter.sort();
-  let end = performance.now();
-  console.log(`Execution time: ${end - start} ms`);
+  console.timeEnd("a");
 
-  start = performance.now();
+  console.time("builtin");
   testArray.sort();
-  end = performance.now();
-  console.log(`Built-in Execution time: ${end - start} ms`);
-
-  sorter = null;
+  console.timeEnd("builtin");
 });
