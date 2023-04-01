@@ -50,6 +50,12 @@ class Index {
       this.iarr[index] = index;
     }
 
+    /**
+     * This is an array unique indexes from iarr that is compatible
+     * with the nth method to retrieve the actual value.
+     */
+    this.uniq = [];
+
     this.sort();
   }
 
@@ -209,6 +215,20 @@ class Index {
         }
       }.bind(this)
     );
+
+    // Create the unique array.
+    this.uniq.push(0);
+    let cv = this.arr[this.iarr[0]];
+    this.iarr.slice(1).forEach(
+      function (e, i) {
+        let v = this.arr[e];
+        if (cv != v) {
+          // we need to add one due to the slice.
+          this.uniq.push(i + 1);
+          cv = v;
+        }
+      }.bind(this)
+    );
   }
 
   /**
@@ -297,10 +317,39 @@ class Index {
    * @return {String} The value at idx.
    */
   nth(idx) {
-    if (Number.isInteger(idx) && idx >= 0 && idx <= this.iarr.length) {
+    if (Number.isInteger(idx) && idx >= 0 && idx < this.iarr.length) {
       return this.arr[this.iarr[idx]];
     }
     return "";
+  }
+
+  /**
+   * Obtain the nth value from the original data array.
+   *
+   * @param {Number} idx The index to the original data array (arr).
+   *
+   * @return {String} The value at idx.
+   */
+  valueWithDataIndex(idx) {
+    if (Number.isInteger(idx) && idx >= 0 && idx < this.arr.length) {
+      return this.arr[idx];
+    }
+    return "";
+  }
+
+  /**
+   * Return the index to the array of the original data (arr)
+   *
+   * @param {Number} idx The index to the sorted index (iarr).
+   *
+   * @return {Number} idx The index to the original data array (arr).
+   */
+  rawIdxAt(idx) {
+    let r = -1;
+    if (Number.isInteger(idx) && idx >= 0 && idx < this.iarr.length) {
+      r = this.iarr[idx];
+    }
+    return r;
   }
 
   /**
@@ -402,5 +451,18 @@ class MovieDB {
         console.log(`merge time (ms): ${d}`);
       }.bind(this)
     );
+  }
+
+  recordBySortKeyAt(key, idx) {
+    let r = { i: idx };
+    let sortIndex = this.indexes[key];
+    let dataIndex = sortIndex.rawIdxAt(idx);
+    Object.keys(this.indexes).forEach(
+      function (indexKey) {
+        let index = this.indexes[indexKey];
+        r[indexKey] = index.valueWithDataIndex(dataIndex);
+      }.bind(this)
+    );
+    return r;
   }
 }
