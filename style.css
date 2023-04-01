@@ -1,0 +1,23 @@
+div.resultTable {
+  display: table;
+  width: 90%;
+  margin: auto;
+  background-color: #ffffff;
+  border-collapse: collapse;
+  border-width: 2px;
+  border-color: #7ea8f8;
+  border-style: solid;
+  color: #000000;
+}
+
+div.resultTable div.row {
+  display: table-row;
+}
+
+div.resultTable div.col {
+  display: table-cell;
+  border-width: 2px;
+  border-color: #7ea8f8;
+  border-style: solid;
+  padding: 5px;
+}
