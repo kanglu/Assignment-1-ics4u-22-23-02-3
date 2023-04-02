@@ -205,7 +205,7 @@ UI.refreshTable = function (pageIndex = 0) {
   newTable.setAttribute("class", "resultTable");
 
   let sortKey = "ACTOR_NAME";
-  UI.curPageSize = wh / rowHeight;
+  UI.curPageSize = Math.trunc(wh / rowHeight);
 
   UI.addHeaderRow(newTable);
 
