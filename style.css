@@ -1,3 +1,8 @@
+:root {
+  --bg: #355084;
+  --tc: rgba(154, 180, 232, 0.8);
+}
+
 h1,
 h4 {
   margin-block: 3px;
@@ -5,21 +10,42 @@ h4 {
 }
 
 div.content {
-  display: block;
+  display: table;
+  min-width: 750px !important;
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
+div.contentRow {
+  display: table-row;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+div.contentCol2,
+div.contentCol {
+  display: table-cell;
+  margin: 0;
+  padding: 0;
+  border-style: none;
+}
+
+div.contentCol2 {
+  position: relative;
+}
+
 div.resultTable {
   display: table;
-  width: 90%;
+  width: 98%;
   margin: auto;
   background-color: #ffffff;
   border-collapse: collapse;
   border-width: 2px;
-  border-color: #7ea8f8;
+  border-color: var(--bg);
   border-style: solid;
   color: #000000;
 }
@@ -32,11 +58,29 @@ div.resultTable div.col,
 div.resultTable div.header {
   display: table-cell;
   border-width: 2px;
-  border-color: #7ea8f8;
+  border-color: var(--bg);
   border-style: solid;
   padding: 5px;
 }
 
 div.resultTable div.header {
-  background-color: #7ea8f8;
+  background-color: var(--bg);
+  color: white;
+}
+
+div.pageBar {
+  /* The rest is dynamically set in javascript */
+  display: block;
+  position: absolute;
+  margin-inline: 2;
+  background-color: var(--bg);
+}
+
+div.pageThumb {
+  /* The rest is dynamically set in javascript */
+  display: block;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  background-color: var(--tc);
 }

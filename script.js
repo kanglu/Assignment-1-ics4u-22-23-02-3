@@ -1,6 +1,9 @@
 // db = new MovieDB("./small_data.json");
 db = new MovieDB("./DO_NOT_TOUCH/data.json");
 
+const minHeight = 400;
+const minWidth = 750;
+
 let displayOrder = [
   "ACTOR_NAME",
   "ACTOR_ID",
@@ -50,9 +53,37 @@ addRecordRow = function (table, r) {
   table.appendChild(rowElem);
 };
 
+fixResize = function () {
+  refreshTable();
+  adjustPageBar();
+};
+
+adjustPageBar = function () {
+  let pb = document.querySelector(".pageBar");
+  let tb = document.querySelector(".resultTable");
+  let headerHeight = tb.children[0].clientHeight;
+  let pbHeight = tb.clientHeight - headerHeight;
+  pb.setAttribute(
+    "style",
+    "width: 14px; border-radius: 7px; height: " +
+      pbHeight +
+      "px; left: 3px; top: " +
+      headerHeight +
+      "px;"
+  );
+
+  let pt = document.querySelector(".pageThumb");
+  let thumbPos = headerHeight;
+  pt.setAttribute(
+    "style",
+    "width: 20px; height: 20px; border-radius: 10px; left: 0px; top: " +
+      thumbPos +
+      "px;"
+  );
+};
+
 refreshTable = function () {
-  let oldTable = document.querySelector(".resultTable");
-  oldTable.innerHTML = "";
+  let oldTable = document.querySelectorAll(".resultTable")[0];
 
   // Starter sizes but will be dynamically adjusted
   const rowHeight = 28;
@@ -74,7 +105,7 @@ refreshTable = function () {
     addRecordRow(newTable, r);
   }
 
-  document.querySelector(".content").replaceChild(newTable, oldTable);
+  oldTable.parentElement.replaceChild(newTable, oldTable);
 
   let allRows = document.querySelectorAll(".row");
   if (allRows && allRows.length > 0) {
@@ -88,14 +119,14 @@ refreshTable = function () {
   }
 };
 
-refreshTable();
+fixResize();
 
 let rzto = null;
 handlerResize = function () {
   if (rzto) {
     clearTimeout(rzto);
   }
-  rzto = setTimeout(refreshTable, 40);
+  rzto = setTimeout(fixResize, 40);
 };
 
 window.addEventListener("resize", handlerResize);
