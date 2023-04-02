@@ -82,7 +82,7 @@ adjustPageBar = function () {
   );
 };
 
-refreshTable = function () {
+refreshTable = function (pageIndex = 0) {
   let oldTable = document.querySelectorAll(".resultTable")[0];
 
   // Starter sizes but will be dynamically adjusted
@@ -95,7 +95,6 @@ refreshTable = function () {
   newTable.setAttribute("class", "resultTable");
 
   let sortKey = "ACTOR_NAME";
-  let pageIndex = 0;
   let pageSize = wh / rowHeight;
 
   addHeaderRow(newTable);
@@ -130,3 +129,64 @@ handlerResize = function () {
 };
 
 window.addEventListener("resize", handlerResize);
+
+let thumbStyle = document.querySelector(".pageThumb").style;
+let oldTop = null;
+let origY = null;
+document
+  .querySelector(".pageThumb")
+  .addEventListener("mousedown", function (ev) {
+    if (origY == null) {
+      origY = ev.clientY;
+      oldTop = parseInt(thumbStyle.top);
+    }
+    document.querySelector("body").setAttribute("class", "disable-select");
+  });
+
+movePageThumb = function (delta) {
+  let pt = document.querySelector(".pageThumb");
+  let pb = document.querySelector(".pageBar");
+  let tb = document.querySelector(".resultTable");
+  let minTop = tb.children[0].clientHeight;
+  let maxTop = minTop + pb.clientHeight - pt.clientHeight;
+  let newTop = oldTop + delta;
+  if (newTop < minTop) {
+    newTop = minTop;
+  }
+  if (newTop > maxTop) {
+    newTop = maxTop;
+  }
+  pt.style.top = newTop + "px";
+};
+
+refreshPageAtIndex = function () {
+  let pt = document.querySelector(".pageThumb");
+  let pb = document.querySelector(".pageBar");
+  let tb = document.querySelector(".resultTable");
+  let minTop = tb.children[0].clientHeight;
+  let maxTop = minTop + pb.clientHeight - pt.clientHeight;
+  refreshTable(
+    Math.trunc(
+      ((parseInt(pt.style.top) - minTop) * db.numOfRecords()) /
+        (maxTop - minTop)
+    )
+  );
+};
+
+document.addEventListener("mousemove", function (ev) {
+  if (origY) {
+    delta = ev.clientY - origY;
+    movePageThumb(delta);
+    refreshPageAtIndex();
+  }
+});
+
+document.addEventListener("mouseup", function (ev) {
+  if (origY) {
+    delta = ev.clientY - origY;
+    movePageThumb(delta);
+    refreshPageAtIndex();
+  }
+  document.querySelector("body").removeAttribute("class");
+  origY = null;
+});

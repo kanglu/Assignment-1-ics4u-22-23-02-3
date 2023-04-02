@@ -429,6 +429,14 @@ class Index {
       console.log(`${idx}: ${item}`);
     });
   }
+
+  numOfItems() {
+    let r = 0;
+    if (Array.isArray(this.arr)) {
+      r = this.arr.length;
+    }
+    return r;
+  }
 }
 
 class MovieDB {
@@ -464,5 +472,9 @@ class MovieDB {
       }.bind(this)
     );
     return r;
+  }
+
+  numOfRecords() {
+    return this.indexes[Object.keys(this.indexes)[0]].numOfItems();
   }
 }
