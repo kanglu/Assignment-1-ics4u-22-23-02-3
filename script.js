@@ -1,15 +1,61 @@
 // db = new MovieDB("./small_data.json");
 db = new MovieDB("./DO_NOT_TOUCH/data.json");
 
+let displayOrder = [
+  "ACTOR_NAME",
+  "ACTOR_ID",
+  "FILM_NAME",
+  "YEAR_RELEASED",
+  "VOTES",
+  "RATING",
+  "FILM_ID",
+];
+
+addHeaderRow = function (table) {
+  let rowElem = document.createElement("div");
+  rowElem.setAttribute("class", "row");
+
+  // Row index filler
+  let elem = document.createElement("div");
+  elem.setAttribute("class", "header");
+  elem.appendChild(document.createTextNode(" "));
+  rowElem.appendChild(elem);
+
+  displayOrder.forEach(function (ck) {
+    let elem = document.createElement("div");
+    elem.setAttribute("class", "header");
+    elem.appendChild(document.createTextNode(ck));
+    rowElem.appendChild(elem);
+  });
+
+  table.appendChild(rowElem);
+};
+
+addRecordRow = function (table, r) {
+  let rowElem = document.createElement("div");
+  rowElem.setAttribute("class", "row");
+
+  let elem = document.createElement("div");
+  elem.setAttribute("class", "col");
+  elem.appendChild(document.createTextNode(r.i + 1));
+  rowElem.appendChild(elem);
+
+  displayOrder.forEach(function (ck) {
+    let elem = document.createElement("div");
+    elem.setAttribute("class", "col");
+    elem.appendChild(document.createTextNode(r[ck]));
+    rowElem.appendChild(elem);
+  });
+
+  table.appendChild(rowElem);
+};
+
 refreshTable = function () {
   let oldTable = document.querySelector(".resultTable");
   oldTable.innerHTML = "";
 
   // Starter sizes but will be dynamically adjusted
-  const headerHeight = 250;
   const rowHeight = 28;
-
-  let ww = window.innerWidth;
   let wh = window.innerHeight;
 
   // create the table
@@ -19,25 +65,16 @@ refreshTable = function () {
 
   let sortKey = "ACTOR_NAME";
   let pageIndex = 0;
-  let pageSize = (wh - headerHeight) / rowHeight;
+  let pageSize = wh / rowHeight;
+
+  addHeaderRow(newTable);
 
   for (let i = pageIndex; i < pageIndex + pageSize; i++) {
-    let rowElem = document.createElement("div");
-    rowElem.setAttribute("class", "row");
-
     let r = db.recordBySortKeyAt(sortKey, i);
-
-    for (const [key, value] of Object.entries(r)) {
-      let elem = document.createElement("div");
-      elem.setAttribute("class", "col");
-      elem.appendChild(document.createTextNode(value));
-      rowElem.appendChild(elem);
-    }
-
-    newTable.appendChild(rowElem);
+    addRecordRow(newTable, r);
   }
 
-  document.querySelector("body").replaceChild(newTable, oldTable);
+  document.querySelector(".content").replaceChild(newTable, oldTable);
 
   let allRows = document.querySelectorAll(".row");
   if (allRows && allRows.length > 0) {
