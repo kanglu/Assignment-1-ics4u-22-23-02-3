@@ -1,6 +1,7 @@
 :root {
   --bg: #355084;
   --tc: rgba(154, 180, 232, 0.8);
+  --searchBG: rgba(53, 80, 132, 0.95);
 }
 
 .disable-select {
@@ -51,7 +52,8 @@ div.contentCol2 {
   position: relative;
 }
 
-div.resultTable {
+div.resultTable,
+div.searchPicksTable {
   display: table;
   width: 98%;
   margin: auto;
@@ -63,12 +65,12 @@ div.resultTable {
   color: #000000;
 }
 
-div.resultTable div.row {
+div.row {
   display: table-row;
 }
 
-div.resultTable div.col,
-div.resultTable div.header {
+div.col,
+div.header {
   display: table-cell;
   border-width: 2px;
   border-color: var(--bg);
@@ -97,4 +99,64 @@ div.pageThumb {
   margin: 0;
   padding: 0;
   background-color: var(--tc);
+}
+
+img#search {
+  cursor: pointer;
+  object-fit: cover;
+}
+
+div.search {
+  position: fixed;
+  display: block;
+  /* size and position set dynamically. */
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border: 4px solid var(--tc);
+  border-radius: 10px;
+  background-color: var(--searchBG);
+  color: white;
+}
+
+div.searchContainer {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+input.searchText {
+  font: 120%;
+  border-radius: 5px;
+  border: solid 3px #bbb;
+  size: 60;
+  padding: 5px;
+}
+
+div.searchItems {
+  margin-block: 10px;
+}
+
+div.searchResults {
+  background-color: white;
+}
+
+div.searchPicksTable {
+  border: none;
+}
+
+div.searchPicksTable .col {
+  width: 200px;
+  border: none;
+}
+
+div.searchHide {
+  display: none;
+}
+
+div.searchShow {
+  display: block;
 }

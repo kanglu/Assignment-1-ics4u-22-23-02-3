@@ -70,6 +70,19 @@ UI.start = function (db) {
     rzto = setTimeout(UI.fixResize, 40);
   });
 
+  document.querySelector("img#search").addEventListener("click", function (ev) {
+    UI.showSearch();
+    ev.stopPropagation();
+  });
+
+  document.querySelector("body").addEventListener("click", function (ev) {
+    let input = document.querySelector(".searchText");
+    if (ev.target == input) {
+      return;
+    }
+    UI.hideSearch();
+  });
+
   let thumbStyle = document.querySelector(".pageThumb").style;
   let origY = null;
   document
@@ -83,6 +96,9 @@ UI.start = function (db) {
     });
 
   document.addEventListener("wheel", function (ev) {
+    if (UI.isSearchShown()) {
+      return;
+    }
     UI.refreshTable(UI.curPageIndex + Math.sign(ev.deltaY) * UI.curPageSize);
     UI.adjustPageBar();
   });
@@ -151,6 +167,52 @@ UI.start = function (db) {
   UI.fixResize();
 };
 
+UI.isSearchShown = function () {
+  let s = document.querySelector("div.search");
+  if (s.getAttribute("class") == "search searchShow") {
+    // already shown
+    return true;
+  }
+  return false;
+};
+
+UI.showSearch = function () {
+  if (UI.isSearchShown()) {
+    return;
+  }
+
+  let s = document.querySelector("div.search");
+
+  let sLabel = document.querySelector("div.searchLabel");
+  let indexName = UI.activeIndex().keyName;
+  let displayName = UI.displaySpec[indexName].title;
+  sLabel.innerHTML = `Searching for ${displayName}`;
+
+  let w = 400;
+  let h = 500;
+  let wh = window.innerHeight;
+  let ww = window.innerWidth;
+  let top = Math.trunc((wh - h) / 2);
+  let left = Math.trunc((ww - w) / 2);
+  s.setAttribute(
+    "style",
+    `top: ${top}px; left: ${left}px; width: ${w}px; height: ${h}px;`
+  );
+
+  let rh = h - 125;
+  let sr = document.querySelector("div.searchResults");
+  sr.setAttribute("style", `height: ${rh}px; overflow-y: scroll`);
+
+  s.setAttribute("class", "search searchShow");
+  document.querySelector("input").focus();
+};
+
+UI.hideSearch = function () {
+  document
+    .querySelector("div.search")
+    .setAttribute("class", "search searchHide");
+};
+
 UI.addHeaderRow = function (table) {
   let rowElem = document.createElement("div");
   rowElem.setAttribute("class", "row");
@@ -175,24 +237,26 @@ UI.addHeaderRow = function (table) {
     elem.appendChild(document.createTextNode(spec.title));
     rowElem.appendChild(elem);
 
-    elem.addEventListener(
-      "click",
-      function (ev) {
-        let index = ev.target.index;
-        let name = index.keyName;
-        if (!index.isReady()) {
-          console.log(`${name} index is not ready yet! Try again later.`);
-          return;
-        }
-        let curIndex = ev.target.curOrderIndex;
+    if (i > 0) {
+      elem.addEventListener(
+        "click",
+        function (ev) {
+          let index = ev.target.index;
+          let name = index.keyName;
+          if (!index.isReady()) {
+            console.log(`${name} index is not ready yet! Try again later.`);
+            return;
+          }
+          let curIndex = ev.target.curOrderIndex;
 
-        UI.displaySpec.order.splice(curIndex, 1);
-        UI.displaySpec.order.splice(0, 0, name);
+          UI.displaySpec.order.splice(curIndex, 1);
+          UI.displaySpec.order.splice(0, 0, name);
 
-        UI.curPageIndex = 0;
-        UI.fixResize();
-      }.bind(this)
-    );
+          UI.curPageIndex = 0;
+          UI.fixResize();
+        }.bind(this)
+      );
+    }
   });
 
   table.appendChild(rowElem);
@@ -278,13 +342,10 @@ UI.refreshTable = function (pageIndex = 0) {
 
   let allRows = document.querySelectorAll(".row");
   if (allRows && allRows.length > 0) {
-    let curRow = allRows.length - 1;
-    let lastRow = allRows[curRow];
-    while (lastRow.offsetTop + lastRow.clientHeight > wh) {
-      lastRow.remove();
-      UI.curPageSize--;
-      curRow--;
-      lastRow = allRows[curRow];
+    for (let i = 0; i < allRows.length; i++) {
+      if (allRows[i].offsetTop + allRows[i].clientHeight > wh) {
+        allRows[i].remove();
+      }
     }
   }
 
@@ -292,6 +353,7 @@ UI.refreshTable = function (pageIndex = 0) {
 };
 
 UI.fixResize = function () {
+  UI.hideSearch();
   UI.refreshTable(UI.curPageIndex);
   UI.adjustPageBar();
 };

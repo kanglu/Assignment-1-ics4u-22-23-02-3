@@ -19,9 +19,48 @@
           <div class="resultTable"></div>
         </div>
         <div class="contentCol2">
+          <img
+            id="search"
+            src="search.svg"
+            style="
+              position: absolute;
+              top: 0px;
+              left: 0px;
+              width: 25px;
+              height: 25px;
+            "
+          />
           <div>&nbsp;&nbsp;&nbsp;</div>
           <div class="pageBar disable-select">&nbsp;</div>
           <div class="pageThumb">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="search searchHide">
+      <div class="searchContainer">
+        <div class="searchItems searchLabel"></div>
+        <div class="searchItems searchInput">
+          <form id="searchForm" onSubmit="return false;">
+            <input
+              class="searchText"
+              id="searchText"
+              name="searchText"
+              type="text"
+              value=""
+              tooltip="Enter your search term"
+            />
+          </form>
+        </div>
+        <div class="searchItems searchResults">
+          <div class="searchPicksTable">
+            <div class="row"><div class="searchPick col">test 1</div></div>
+            <div class="row"><div class="searchPick col">test 2</div></div>
+            <div class="row"><div class="searchPick col">test 3</div></div>
+            <div class="row"><div class="searchPick col">test 4</div></div>
+            <div class="row"><div class="searchPick col">test 5</div></div>
+            <div class="row"><div class="searchPick col">test 6</div></div>
+          </div>
         </div>
       </div>
     </div>
