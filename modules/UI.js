@@ -101,18 +101,44 @@ UI.start = function (db) {
   });
 
   document.addEventListener("keydown", function (ev) {
+    console.log(ev.altKey);
     if (ev.code == "ArrowDown") {
-      UI.refreshTable(UI.curPageIndex + 1);
+      let delta = 1;
+      if (ev.altKey) {
+        let index = UI.activeIndex();
+        let term = index.nth(UI.curPageIndex);
+        let range = index.getRangeOf(term);
+        delta = range[1] - UI.curPageIndex;
+      }
+      UI.refreshTable(UI.curPageIndex + delta);
+      UI.adjustPageBar();
     } else if (ev.code == "ArrowUp") {
-      UI.refreshTable(UI.curPageIndex - 1);
+      let delta = 1;
+      if (ev.altKey) {
+        let index = UI.activeIndex();
+        let term = index.nth(UI.curPageIndex);
+        let range = index.getRangeOf(term);
+        let nextTermIdx = range[0];
+        if (nextTermIdx > 0) {
+          // Get the previous range of the "different" term
+          range = index.getRangeOf(index.nth(nextTermIdx - 1));
+        }
+        delta = UI.curPageIndex - range[0];
+      }
+      UI.refreshTable(UI.curPageIndex - delta);
+      UI.adjustPageBar();
     } else if (ev.code == "PageUp") {
       UI.refreshTable(UI.curPageIndex - UI.curPageSize);
+      UI.adjustPageBar();
     } else if (ev.code == "PageDown") {
       UI.refreshTable(UI.curPageIndex + UI.curPageSize);
+      UI.adjustPageBar();
     } else if (ev.code == "Home") {
       UI.refreshTable(0);
+      UI.adjustPageBar();
     } else if (ev.code == "End") {
       UI.refreshTable(UI.db.numOfRecords() - UI.curPageSize);
+      UI.adjustPageBar();
     }
   });
 
@@ -280,6 +306,11 @@ UI.movePageThumb = function (delta) {
     newTop = maxTop;
   }
   pt.style.top = newTop + "px";
+};
+
+UI.activeIndex = function () {
+  let curKey = UI.displaySpec.order[0];
+  return UI.db.indexes[curKey];
 };
 
 UI.refreshTableBasedOnThumb = function () {
