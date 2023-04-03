@@ -162,6 +162,14 @@ UI.start = function (db) {
     }
   });
 
+  document.querySelector("input").addEventListener("keyup", function (ev) {
+    console.log(ev.target.value);
+    if (ev.code == "Enter") {
+      console.log(`Do search for ${ev.target.value}`);
+    }
+    ev.stopPropagation();
+  });
+
   // Initialize the first display of data and resize the content
   // in the browser window.
   UI.fixResize();
@@ -204,7 +212,9 @@ UI.showSearch = function () {
   sr.setAttribute("style", `height: ${rh}px; overflow-y: scroll`);
 
   s.setAttribute("class", "search searchShow");
-  document.querySelector("input").focus();
+  let inputText = document.querySelector("input");
+  inputText.value = "";
+  inputText.focus();
 };
 
 UI.hideSearch = function () {
