@@ -3,6 +3,7 @@ class UI {
 }
 
 UI.setupDefaults = function () {
+  // width must add to 95% the other 5% is for the row id.
   UI.displaySpec = {
     ACTOR_NAME: {
       title: "Actor",
@@ -16,7 +17,7 @@ UI.setupDefaults = function () {
 
     FILM_NAME: {
       title: "Movie",
-      width: "40%",
+      width: "32%",
     },
 
     YEAR_RELEASED: {
@@ -102,12 +103,16 @@ UI.start = function (db) {
   document.addEventListener("keydown", function (ev) {
     if (ev.code == "ArrowDown") {
       UI.refreshTable(UI.curPageIndex + 1);
-    }
-  });
-
-  document.addEventListener("keyup", function (ev) {
-    if (ev.code == "ArrowUp") {
+    } else if (ev.code == "ArrowUp") {
       UI.refreshTable(UI.curPageIndex - 1);
+    } else if (ev.code == "PageUp") {
+      UI.refreshTable(UI.curPageIndex - UI.curPageSize);
+    } else if (ev.code == "PageDown") {
+      UI.refreshTable(UI.curPageIndex + UI.curPageSize);
+    } else if (ev.code == "Home") {
+      UI.refreshTable(0);
+    } else if (ev.code == "End") {
+      UI.refreshTable(UI.db.numOfRecords() - UI.curPageSize);
     }
   });
 
@@ -123,16 +128,41 @@ UI.addHeaderRow = function (table) {
   // Row index filler
   let elem = document.createElement("div");
   elem.setAttribute("class", "header");
+  elem.setAttribute("style", "width: 8%");
   elem.appendChild(document.createTextNode(" "));
   rowElem.appendChild(elem);
 
-  UI.displaySpec.order.forEach(function (ck) {
+  UI.displaySpec.order.forEach(function (ck, i) {
     let spec = UI.displaySpec[ck];
     let elem = document.createElement("div");
+    elem.index = UI.db.indexes[ck];
+    elem.curOrderIndex = i;
     elem.setAttribute("class", "header");
-    elem.setAttribute("style", "width: " + spec.width);
+    elem.setAttribute(
+      "style",
+      "width: " + spec.width + (i == 0 ? "; color: yellow" : "")
+    );
     elem.appendChild(document.createTextNode(spec.title));
     rowElem.appendChild(elem);
+
+    elem.addEventListener(
+      "click",
+      function (ev) {
+        let index = ev.target.index;
+        let name = index.keyName;
+        if (!index.isReady()) {
+          console.log(`${name} index is not ready yet! Try again later.`);
+          return;
+        }
+        let curIndex = ev.target.curOrderIndex;
+
+        UI.displaySpec.order.splice(curIndex, 1);
+        UI.displaySpec.order.splice(0, 0, name);
+
+        UI.curPageIndex = 0;
+        UI.fixResize();
+      }.bind(this)
+    );
   });
 
   table.appendChild(rowElem);
@@ -204,7 +234,7 @@ UI.refreshTable = function (pageIndex = 0) {
   let newTable = document.createElement("div");
   newTable.setAttribute("class", "resultTable");
 
-  let sortKey = "ACTOR_NAME";
+  let sortKey = UI.displaySpec.order[0];
   UI.curPageSize = Math.trunc(wh / rowHeight);
 
   UI.addHeaderRow(newTable);

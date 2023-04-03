@@ -79,6 +79,7 @@ div.resultTable div.header {
 div.resultTable div.header {
   background-color: var(--bg);
   color: white;
+  cursor: pointer;
 }
 
 div.pageBar {

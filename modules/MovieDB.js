@@ -28,12 +28,16 @@ class Index {
    * non-destructive merge sort. The sorted results can be
    * retrieved, and searched by its member functions.
    *
-   * @param {String} arr The input array to be sorted.
+   * @param {String} keyName The key name that this index represents.
+   *
+   * @param {[String]} arr The input array to be sorted.
    */
-  constructor(arr) {
+  constructor(keyName, arr) {
     if (!Array.isArray(arr)) {
       return;
     }
+
+    this.keyName = keyName;
 
     /**
      * This is the input source array is used for reference only
@@ -55,8 +59,17 @@ class Index {
      * with the nth method to retrieve the actual value.
      */
     this.uniq = [];
+  }
 
-    this.sort();
+  /**
+   * The index is ready when all the sorting and unique list has
+   * been processed.
+   *
+   * @return true When all data within the index is sorted and
+   *              ready to use.
+   */
+  isReady() {
+    return this.uniq.length > 0;
   }
 
   /**
@@ -229,6 +242,10 @@ class Index {
         }
       }.bind(this)
     );
+
+    let pet = performance.now();
+    let d = pet - appStart;
+    console.log(`${this.keyName} sort from start time (ms): ${d}`);
   }
 
   /**
@@ -439,26 +456,36 @@ class Index {
   }
 }
 
+appStart = performance.now();
+
 class MovieDB {
   constructor(jsonDataFile) {
     this.indexes = {};
+    this.data = loadJSON(jsonDataFile);
 
-    let data = loadJSON(jsonDataFile);
-    Object.keys(DBKEYS).forEach(
+    let keys = Object.keys(DBKEYS);
+    this.createIndexForKey(keys[0]);
+    this.indexes[keys[0]].sort();
+
+    keys.slice(1).forEach(
       function (key) {
-        console.log(`==>Sorting for ${key}`);
-        let testArray = data[DBKEYS[key]];
+        this.createIndexForKey(key);
+        let sortFunc = this.indexes[key].sort.bind(this.indexes[key]);
 
-        let pst = performance.now();
-        let index = new Index(testArray);
-        let pet = performance.now();
-
-        this.indexes[key] = index;
-
-        let d = pet - pst;
-        console.log(`merge time (ms): ${d}`);
+        // schedule for sorting, so we get a
+        // faster response time.
+        setTimeout(sortFunc, 5);
       }.bind(this)
     );
+  }
+
+  createIndexForKey(key) {
+    console.log(`==>Sorting for ${key}`);
+    let testArray = this.data[DBKEYS[key]];
+
+    let index = new Index(key, testArray);
+
+    this.indexes[key] = index;
   }
 
   recordBySortKeyAt(key, idx) {
