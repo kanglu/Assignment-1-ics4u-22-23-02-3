@@ -82,6 +82,11 @@ UI.start = function (db) {
       document.querySelector("body").setAttribute("class", "disable-select");
     });
 
+  document.addEventListener("wheel", function (ev) {
+    UI.refreshTable(UI.curPageIndex + Math.sign(ev.deltaY) * UI.curPageSize);
+    UI.adjustPageBar();
+  });
+
   document.addEventListener("mousemove", function (ev) {
     if (origY) {
       delta = ev.clientY - origY;
@@ -101,7 +106,6 @@ UI.start = function (db) {
   });
 
   document.addEventListener("keydown", function (ev) {
-    console.log(ev.altKey);
     if (ev.code == "ArrowDown") {
       let delta = 1;
       if (ev.altKey) {
