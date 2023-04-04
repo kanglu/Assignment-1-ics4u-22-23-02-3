@@ -67,20 +67,17 @@ UI.start = function (db) {
     if (rzto) {
       clearTimeout(rzto);
     }
-    rzto = setTimeout(UI.fixResize, 40);
+    rzto = setTimeout(UI.fixResize, 100);
+  });
+
+  document.querySelector("img#cancel").addEventListener("click", function (ev) {
+    UI.hideSearch();
+    ev.stopPropagation();
   });
 
   document.querySelector("img#search").addEventListener("click", function (ev) {
     UI.showSearch();
     ev.stopPropagation();
-  });
-
-  document.querySelector("body").addEventListener("click", function (ev) {
-    let input = document.querySelector(".searchText");
-    if (ev.target == input) {
-      return;
-    }
-    UI.hideSearch();
   });
 
   let thumbStyle = document.querySelector(".pageThumb").style;
@@ -212,6 +209,7 @@ UI.doSearch = function (term) {
   document.querySelectorAll("div.searchPicksTable .col").forEach(function (e) {
     e.addEventListener("click", function (ev) {
       let term = ev.target.innerText;
+      UI.hideSearch();
       UI.refreshTable(UI.activeIndex().getFirstIndexOf(term));
       UI.adjustPageBar();
     });
@@ -255,7 +253,7 @@ UI.showSearch = function () {
 
   let rh = h - 125;
   let sr = document.querySelector("div.searchResults");
-  sr.setAttribute("style", `height: ${rh}px; overflow-y: scroll`);
+  sr.setAttribute("style", `height: ${rh}px; overflow-y: auto`);
 
   s.setAttribute("class", "search searchShow");
   let inputText = document.querySelector("input");
@@ -402,7 +400,8 @@ UI.refreshTable = function (pageIndex = 0) {
   let oldTable = document.querySelectorAll(".resultTable")[0];
 
   // Starter sizes but will be dynamically adjusted
-  const rowHeight = 28;
+  let firstRow = document.querySelector(".resultTable .row");
+  const rowHeight = firstRow ? firstRow.clientHeight : 30;
   let wh = window.innerHeight;
 
   // create the table
@@ -411,7 +410,7 @@ UI.refreshTable = function (pageIndex = 0) {
   newTable.setAttribute("class", "resultTable");
 
   let sortKey = UI.displaySpec.order[0];
-  UI.curPageSize = Math.trunc(wh / rowHeight);
+  UI.curPageSize = Math.trunc((wh - 160) / rowHeight - 0.5);
 
   UI.addHeaderRow(newTable);
 

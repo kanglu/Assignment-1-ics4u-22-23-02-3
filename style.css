@@ -109,7 +109,7 @@ div.pageThumb {
   background-color: var(--tc);
 }
 
-img#search {
+img {
   cursor: pointer;
   object-fit: cover;
 }
@@ -171,7 +171,7 @@ div.searchHide {
 }
 
 div.searchShow {
-  display: block;
+  display: relative;
 }
 
 span.ft {
