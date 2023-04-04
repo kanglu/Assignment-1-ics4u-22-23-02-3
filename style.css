@@ -81,7 +81,15 @@ div.header {
 div.resultTable div.header {
   background-color: var(--bg);
   color: white;
+  cursor: default;
+}
+
+div.resultTable div.clickable {
   cursor: pointer;
+}
+
+div.resultTable div.col.clickable:hover {
+  color: red;
 }
 
 div.pageBar {
@@ -151,6 +159,11 @@ div.searchPicksTable {
 div.searchPicksTable .col {
   width: 200px;
   border: none;
+  padding: 2px;
+}
+
+div.searchPicksTable .col:hover {
+  border: 1px solid var(--tc);
 }
 
 div.searchHide {
@@ -159,4 +172,9 @@ div.searchHide {
 
 div.searchShow {
   display: block;
+}
+
+span.ft {
+  color: white;
+  background-color: var(--searchBG);
 }

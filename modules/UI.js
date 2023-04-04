@@ -162,17 +162,60 @@ UI.start = function (db) {
     }
   });
 
+  let searchTimer = null;
   document.querySelector("input").addEventListener("keyup", function (ev) {
-    console.log(ev.target.value);
-    if (ev.code == "Enter") {
-      console.log(`Do search for ${ev.target.value}`);
-    }
     ev.stopPropagation();
+    if (ev.code == "Enter") {
+      let picks = document.querySelectorAll("div.searchPicksTable .col");
+      if (!picks || picks.length == 0) {
+        return;
+      } else {
+        // get the first term and refresh the page
+        let term = picks[0].innerText;
+        UI.refreshTable(UI.activeIndex().getFirstIndexOf(term));
+        UI.adjustPageBar();
+        return;
+      }
+    } else {
+      if (searchTimer) {
+        clearTimeout(searchTimer);
+      }
+      searchTimer = setTimeout(UI.doSearch, 200, ev.target.value, false);
+    }
   });
 
   // Initialize the first display of data and resize the content
   // in the browser window.
   UI.fixResize();
+};
+
+UI.doSearch = function (term) {
+  searchTimer = null;
+
+  let oldPicks = document.querySelector(".searchPicksTable");
+  let newPicks = document.createElement("div");
+  newPicks.setAttribute("class", "searchPicksTable");
+
+  let matches = UI.activeIndex().search(term);
+  matches.forEach(function (val) {
+    let row = document.createElement("div");
+    row.setAttribute("class", "row");
+    let elem = document.createElement("div");
+    elem.setAttribute("class", "searchPick col");
+    elem.innerHTML = val;
+    // elem.appendChild(document.createTextNode(val));
+    row.appendChild(elem);
+    newPicks.appendChild(row);
+  });
+  oldPicks.parentElement.replaceChild(newPicks, oldPicks);
+
+  document.querySelectorAll("div.searchPicksTable .col").forEach(function (e) {
+    e.addEventListener("click", function (ev) {
+      let term = ev.target.innerText;
+      UI.refreshTable(UI.activeIndex().getFirstIndexOf(term));
+      UI.adjustPageBar();
+    });
+  });
 };
 
 UI.isSearchShown = function () {
@@ -195,6 +238,9 @@ UI.showSearch = function () {
   let indexName = UI.activeIndex().keyName;
   let displayName = UI.displaySpec[indexName].title;
   sLabel.innerHTML = `Searching for ${displayName}`;
+
+  let oldPicks = document.querySelector(".searchPicksTable");
+  oldPicks.innerHTML = "";
 
   let w = 400;
   let h = 500;
@@ -248,6 +294,7 @@ UI.addHeaderRow = function (table) {
     rowElem.appendChild(elem);
 
     if (i > 0) {
+      elem.setAttribute("class", "header clickable");
       elem.addEventListener(
         "click",
         function (ev) {
@@ -281,11 +328,36 @@ UI.addRecordRow = function (table, r) {
   elem.appendChild(document.createTextNode(r.i + 1));
   rowElem.appendChild(elem);
 
-  UI.displaySpec.order.forEach(function (ck) {
+  UI.displaySpec.order.forEach(function (ck, i) {
     let elem = document.createElement("div");
-    elem.setAttribute("class", "col");
+    elem.setAttribute("class", "col" + (i > 0 ? " clickable" : ""));
     elem.appendChild(document.createTextNode(r[ck]));
+    elem.index = UI.db.indexes[ck];
+    elem.curOrderIndex = i;
     rowElem.appendChild(elem);
+
+    if (i > 0) {
+      elem.addEventListener("click", function (ev) {
+        let term = ev.target.innerText;
+
+        // Switch to the dbkey as the new key
+        //!!TODO: this is the same code as the addHeader - simplify
+
+        let index = ev.target.index;
+        let name = index.keyName;
+        if (!index.isReady()) {
+          console.log(`${name} index is not ready yet! Try again later.`);
+          return;
+        }
+        let curIndex = ev.target.curOrderIndex;
+
+        UI.displaySpec.order.splice(curIndex, 1);
+        UI.displaySpec.order.splice(0, 0, name);
+
+        UI.curPageIndex = elem.index.getFirstIndexOf(term);
+        UI.fixResize();
+      });
+    }
   });
 
   table.appendChild(rowElem);

@@ -447,6 +447,12 @@ class Index {
     });
   }
 
+  /**
+   * This function returns the number of elements in the original
+   * or data array.
+   *
+   * @return {Number} The number of items in the input (data) array.
+   */
   numOfItems() {
     let r = 0;
     if (Array.isArray(this.arr)) {
@@ -454,16 +460,62 @@ class Index {
     }
     return r;
   }
+
+  /**
+   * Perform a linear search with regular expression on the uniq array.
+   *
+   * @param {String} term  This is the search string.
+   *
+   * @return [{String}]  An array of matched values.
+   */
+  search(term) {
+    let sr = []; // array to store starting matches
+    let r = []; // array to store matches of second or subsequent word
+    let regex = new RegExp(`\\b${term}`, "i");
+    let regexRepl = new RegExp(`\\b(${term})`, "gi");
+
+    this.uniq.forEach(
+      function (i) {
+        let v = this.nth(i);
+        let m = null;
+        if ((m = regex.exec(v))) {
+          let target = m.index > 0 ? r : sr;
+          target.push(v.replace(regexRepl, '<span class="ft">$1</span>'));
+        }
+      }.bind(this)
+    );
+
+    // concat the two arrays
+    sr.push.apply(sr, r);
+    return sr;
+  }
 }
 
-appStart = performance.now();
+/**
+ * A time tag indicating when we started the application.
+ */
+const appStart = performance.now();
 
+/**
+ * A simple class used to process the input JSON data, and
+ * housing of the individual indexes used to iterate, and
+ * access the original data categories of the JSON.
+ */
 class MovieDB {
+  /**
+   * Take a path to the JSON file and initialize the indexes.
+   *
+   * @param {String} jsonDataFile  This is the path to the JSON file.
+   */
   constructor(jsonDataFile) {
     this.indexes = {};
     this.data = loadJSON(jsonDataFile);
 
     let keys = Object.keys(DBKEYS);
+
+    // We just need to index the first key to initially display
+    // the data. We can schedule the sorting of the keys
+    // asynchronously.
     this.createIndexForKey(keys[0]);
     this.indexes[keys[0]].sort();
 
@@ -479,6 +531,13 @@ class MovieDB {
     );
   }
 
+  /**
+   * Creates the index without sorting but just hold the data
+   * for later access. The sorting is mostly lazily performed.
+   *
+   * @param {String} key This is the database key (or the
+   *                     first level JSON object key).
+   */
   createIndexForKey(key) {
     console.log(`==>Sorting for ${key}`);
     let testArray = this.data[DBKEYS[key]];
@@ -488,6 +547,18 @@ class MovieDB {
     this.indexes[key] = index;
   }
 
+  /**
+   * Retrieve all the record fields based on the sorted index
+   * of a specific database key.
+   *
+   * @param {String} key The database key (must be a member
+   *                     of DBKEYS).
+   *
+   * @param {Number} idx The numerical sorted index of the record.
+   *
+   * @return [{String}]  An array containing all the field
+   *                     values of the corresponding record.
+   */
   recordBySortKeyAt(key, idx) {
     let r = { i: idx };
     let sortIndex = this.indexes[key];
@@ -501,6 +572,12 @@ class MovieDB {
     return r;
   }
 
+  /**
+   * Return the number of total records.
+   *
+   * @return {Number} The number of logical records that were
+   *                  processed and indexed.
+   */
   numOfRecords() {
     return this.indexes[Object.keys(this.indexes)[0]].numOfItems();
   }
