@@ -591,4 +591,107 @@ class MovieDB {
   numOfRecords() {
     return this.indexes[Object.keys(this.indexes)[0]].numOfItems();
   }
+
+  /**
+   * Do a breadth first search on all common movies between the base
+   * actor and the seek actor.
+   *
+   * @param {String} baseActor  This is the ACTOR_ID of the base actor.
+   *
+   * @param {String} seekActor  This is the ACTOR_ID of the seek actor.
+   *
+   * @return {Object}   { found: true, film: film_id, mactor } OR
+   *                    { found: false, actors: Set of actors } }
+   */
+  findSameCastForActor(baseActor, seekActor, doneMovies) {
+    let actorIndex = this.indexes["ACTOR_ID"];
+    let movieIndex = this.indexes["FILM_ID"];
+
+    let uniqActors = new Set();
+
+    // Get all movies that the base actor made
+    let actorRange = actorIndex.getRangeOf(baseActor);
+    for (let i = actorRange[0]; i < actorRange[1]; i++) {
+      let movie = movieIndex.valueWithDataIndex(actorIndex.rawIdxAt(i));
+      if (doneMovies.has(movie)) {
+        continue;
+      }
+      doneMovies.add(movie);
+
+      // Get all actors for each movie
+      let movieRange = movieIndex.getRangeOf(movie);
+      for (let m = movieRange[0]; m < movieRange[1]; m++) {
+        let ridx = movieIndex.rawIdxAt(m);
+        let mactor = actorIndex.valueWithDataIndex(ridx);
+
+        if (mactor == seekActor) {
+          let r = {
+            found: true,
+            fromActor: baseActor,
+            film: movie,
+            actor: mactor,
+          };
+          return r;
+        }
+        uniqActors.add(mactor);
+      }
+    }
+
+    return { found: false, actors: uniqActors };
+  }
+
+  findAllMoviesByActors(actors) {
+    let films = new Set();
+    let actorIndex = this.indexes["ACTOR_ID"];
+    let movieIndex = this.indexes["FILM_ID"];
+    actors.forEach(function (aid) {
+      let range = actorIndex.getRangeOf(aid);
+      for (let m = range[0]; m < range[1]; m++) {
+        let ridx = actorIndex.rawIdxAt(m);
+        let movie = movieIndex.valueWithDataIndex(ridx);
+        films.add(movie);
+      }
+    });
+    return films;
+  }
+
+  findPathToActor(baseActor, seekActor) {
+    let doneMovies = new Set();
+    let r = this.findSameCastForActor(baseActor, seekActor, doneMovies);
+    while (!r.found) {
+      let newMovies = this.findAllMoviesByActors(r.actors);
+      doneMovies.forEach(function (movie) {
+        newMovies.delete(movie);
+      });
+      if (newMovies.size == 0 || r.actors.size == 0) {
+        break;
+      }
+
+      for (const aid of r.actors) {
+        r = this.findSameCastForActor(aid, seekActor, doneMovies);
+        if (r.found) {
+          break;
+        }
+      }
+    }
+
+    return r;
+  }
+
+  findConnectionsBetweenActors(baseActor, seekActor) {
+    let finalPath = [];
+
+    let curTarget = seekActor;
+    do {
+      let last = this.findPathToActor(baseActor, curTarget);
+      if (last.found) {
+        finalPath.push(last);
+        curTarget = last.fromActor;
+      } else {
+        break;
+      }
+    } while (curTarget != baseActor);
+
+    return finalPath;
+  }
 }
