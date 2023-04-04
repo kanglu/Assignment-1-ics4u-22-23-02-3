@@ -267,6 +267,22 @@ UI.hideSearch = function () {
     .setAttribute("class", "search searchHide");
 };
 
+UI.switchKey = function (ev, startRowIndex = 0) {
+  let index = ev.target.index;
+  let name = index.keyName;
+  if (!index.isReady()) {
+    console.log(`${name} index is not ready yet! Try again later.`);
+    return;
+  }
+  let curIndex = ev.target.curOrderIndex;
+
+  UI.displaySpec.order.splice(curIndex, 1);
+  UI.displaySpec.order.splice(0, 0, name);
+
+  UI.curPageIndex = startRowIndex;
+  UI.fixResize();
+};
+
 UI.addHeaderRow = function (table) {
   let rowElem = document.createElement("div");
   rowElem.setAttribute("class", "row");
@@ -293,24 +309,7 @@ UI.addHeaderRow = function (table) {
 
     if (i > 0) {
       elem.setAttribute("class", "header clickable");
-      elem.addEventListener(
-        "click",
-        function (ev) {
-          let index = ev.target.index;
-          let name = index.keyName;
-          if (!index.isReady()) {
-            console.log(`${name} index is not ready yet! Try again later.`);
-            return;
-          }
-          let curIndex = ev.target.curOrderIndex;
-
-          UI.displaySpec.order.splice(curIndex, 1);
-          UI.displaySpec.order.splice(0, 0, name);
-
-          UI.curPageIndex = 0;
-          UI.fixResize();
-        }.bind(this)
-      );
+      elem.addEventListener("click", UI.switchKey);
     }
   });
 
@@ -328,32 +327,24 @@ UI.addRecordRow = function (table, r) {
 
   UI.displaySpec.order.forEach(function (ck, i) {
     let elem = document.createElement("div");
-    elem.setAttribute("class", "col" + (i > 0 ? " clickable" : ""));
-    elem.appendChild(document.createTextNode(r[ck]));
     elem.index = UI.db.indexes[ck];
+    let text = r[ck];
+    if (ck == "FILM_ID") {
+      text = `<a href="https://www.imdb.com/title/${text}/" target="_blank">${text}</a>`;
+    } else if (ck == "ACTOR_ID") {
+      text = `<a href="https://www.imdb.com/name/${text}/" target="_blank">${text}</a>`;
+    }
+
+    elem.setAttribute("class", "col" + (i > 0 ? " clickable" : ""));
+    elem.innerHTML = text;
+
     elem.curOrderIndex = i;
     rowElem.appendChild(elem);
 
-    if (i > 0) {
+    if (i > 0 && ck != "FILM_ID" && ck != "ACTOR_ID") {
       elem.addEventListener("click", function (ev) {
         let term = ev.target.innerText;
-
-        // Switch to the dbkey as the new key
-        //!!TODO: this is the same code as the addHeader - simplify
-
-        let index = ev.target.index;
-        let name = index.keyName;
-        if (!index.isReady()) {
-          console.log(`${name} index is not ready yet! Try again later.`);
-          return;
-        }
-        let curIndex = ev.target.curOrderIndex;
-
-        UI.displaySpec.order.splice(curIndex, 1);
-        UI.displaySpec.order.splice(0, 0, name);
-
-        UI.curPageIndex = elem.index.getFirstIndexOf(term);
-        UI.fixResize();
+        UI.switchKey(ev, elem.index.getFirstIndexOf(term));
       });
     }
   });
