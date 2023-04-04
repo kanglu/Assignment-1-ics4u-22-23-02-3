@@ -41,9 +41,19 @@ class Index {
 
     /**
      * This is the input source array is used for reference only
-     * and will not be modified.
+     * and will not be modified (except for numerical conversion).
      */
-    this.arr = arr;
+    switch (keyName) {
+      case "VOTES":
+      case "YEAR_RELEASED":
+      case "RATING":
+        this.arr = arr.map(Number);
+        break;
+
+      default:
+        this.arr = arr;
+        break;
+    }
 
     /**
      * This is the index array used for sorting. It contains indexes

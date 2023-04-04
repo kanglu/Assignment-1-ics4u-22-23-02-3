@@ -169,6 +169,7 @@ UI.start = function (db) {
       } else {
         // get the first term and refresh the page
         let term = picks[0].innerText;
+        UI.hideSearch();
         UI.refreshTable(UI.activeIndex().getFirstIndexOf(term));
         UI.adjustPageBar();
         return;
@@ -401,7 +402,7 @@ UI.refreshTable = function (pageIndex = 0) {
   newTable.setAttribute("class", "resultTable");
 
   let sortKey = UI.displaySpec.order[0];
-  UI.curPageSize = Math.trunc((wh - 160) / rowHeight - 0.5);
+  UI.curPageSize = Math.trunc((wh - 160) / rowHeight - 2);
 
   UI.addHeaderRow(newTable);
 
