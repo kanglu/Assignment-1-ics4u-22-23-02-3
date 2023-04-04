@@ -486,7 +486,7 @@ class Index {
 
     this.uniq.forEach(
       function (i) {
-        let v = this.nth(i);
+        let v = this.nth(i).toString();
         let m = null;
         if ((m = regex.exec(v))) {
           let target = m.index > 0 ? r : sr;
