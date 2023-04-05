@@ -95,7 +95,7 @@ UI.start = function (db) {
     });
 
   document.addEventListener("wheel", function (ev) {
-    if (UI.show.isShown()) {
+    if (UI.search.isShown()) {
       return;
     }
     UI.refreshTable(UI.curPageIndex + Math.sign(ev.deltaY) * UI.curPageSize);
@@ -167,13 +167,18 @@ UI.start = function (db) {
 };
 
 UI.switchKey = function (ev, startRowIndex = 0) {
-  let index = ev.target.index;
+  let index = ev.target.parentElement.parentElement.index;
+  let curIndex = ev.target.parentElement.parentElement.curOrderIndex;
+  if (!index) {
+    // Can also come from a non-header column click
+    index = ev.target.index;
+    curIndex = ev.target.curOrderIndex;
+  }
   let name = index.keyName;
   if (!index.isReady()) {
     console.log(`${name} index is not ready yet! Try again later.`);
     return;
   }
-  let curIndex = ev.target.curOrderIndex;
 
   UI.displaySpec.order.splice(curIndex, 1);
   UI.displaySpec.order.splice(0, 0, name);
@@ -203,7 +208,14 @@ UI.addHeaderRow = function (table) {
       "style",
       "width: " + spec.width + (i == 0 ? "; color: yellow" : "")
     );
-    elem.appendChild(document.createTextNode(spec.title));
+
+    let icon = "";
+    if (ck == "ACTOR_NAME") {
+      icon = '<img src="links.svg" width="25px" height="25px" id="links"/>';
+    }
+
+    elem.innerHTML = `<div style="display:flex; margin: 0; pading: 0; flex-direction: row; column-gap: 10px; align-items: baseline;">${icon}<div>${spec.title}</div></div>`;
+    // elem.appendChild(document.createTextNode(spec.title));
     rowElem.appendChild(elem);
 
     if (i > 0) {
@@ -291,7 +303,7 @@ UI.refreshTable = function (pageIndex = 0) {
 
   // Starter sizes but will be dynamically adjusted
   let firstRow = document.querySelector(".resultTable .row");
-  const rowHeight = firstRow ? firstRow.clientHeight : 30;
+  const rowHeight = firstRow ? firstRow.nextElementSibling.clientHeight : 30;
   let wh = window.innerHeight;
 
   // create the table
@@ -300,7 +312,7 @@ UI.refreshTable = function (pageIndex = 0) {
   newTable.setAttribute("class", "resultTable");
 
   let sortKey = UI.displaySpec.order[0];
-  UI.curPageSize = Math.trunc((wh - 160) / rowHeight - 2);
+  UI.curPageSize = Math.trunc((wh - 175) / rowHeight - 2);
 
   UI.addHeaderRow(newTable);
 
