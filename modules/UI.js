@@ -213,8 +213,11 @@ UI.addHeaderRow = function (table) {
       icon = '<img src="links.svg" width="25px" height="25px" id="links"/>';
     }
 
-    elem.innerHTML = `<div style="display:flex; margin: 0; pading: 0; flex-direction: row; column-gap: 10px; align-items: baseline;">${icon}<div>${spec.title}</div></div>`;
-    // elem.appendChild(document.createTextNode(spec.title));
+    elem.innerHTML =
+      `<div style="display:flex; margin: 0; pading: 0;` +
+      `flex-direction: row; column-gap: 10px; align-items: baseline;">` +
+      `${icon}<div>${spec.title}</div></div>`;
+
     rowElem.appendChild(elem);
 
     if (i > 0) {
@@ -290,6 +293,48 @@ UI.adjustPageBar = function () {
   );
 };
 
+UI.showActorConnections = function (path) {
+  // Too lazy - repurpose the Search dialog.
+  Search.show(null, "Connection Results:");
+
+  let oldPicks = document.querySelector(".searchPicksTable");
+  let newPicks = document.createElement("div");
+  newPicks.setAttribute("class", "searchPicksTable");
+
+  if (path.length == 0) {
+    let row = document.createElement("div");
+    row.setAttribute("class", "row");
+    let elem = document.createElement("div");
+    elem.setAttribute("class", "searchPick col");
+    elem.innerHTML = "No Connections Found!";
+    row.appendChild(elem);
+    newPicks.appendChild(row);
+  } else {
+    path.reverse().forEach(function (node) {
+      let row = document.createElement("div");
+      row.setAttribute("class", "row");
+      let elem = document.createElement("div");
+      elem.setAttribute("class", "searchPick col");
+      let fromActorName = UI.db.actorNameForID(node.fromActor);
+      let toActorName = UI.db.actorNameForID(node.actor);
+      let filmName = UI.db.filmNameForID(node.film);
+      //!!TODO draw a nicer version of the connection graph!
+      let fromActorElem = document.createElement("div");
+      let toActorElem = document.createElement("div");
+      let filmElem = document.createElement("div");
+      fromActorElem.appendChild(document.createTextNode(fromActorName));
+      toActorElem.appendChild(document.createTextNode(toActorName));
+      filmElem.appendChild(document.createTextNode(filmName));
+      elem.appendChild(fromActorElem);
+      elem.appendChild(toActorElem);
+      elem.appendChild(filmElem);
+      row.appendChild(elem);
+      newPicks.appendChild(row);
+    });
+  }
+  oldPicks.parentElement.replaceChild(newPicks, oldPicks);
+};
+
 UI.addActorLinksBinding = function () {
   document.querySelector("img#links").addEventListener("click", function (ev) {
     Search.show(
@@ -299,24 +344,19 @@ UI.addActorLinksBinding = function () {
         let actor1 = pick;
         Search.show(
           UI.db.indexes["ACTOR_NAME"],
-          "Actor Connection: Pick the second actor:",
+          `<div style="line-height:1.5em">Actor Connection:</div>` +
+            `<div style="line-height:1.5em"><span style="color: yellow">${actor1}</span> chosen;</div>` +
+            `<div>Please pick the second actor:</div>`,
           function (pick) {
             let actor2 = pick;
             let actorIndex = UI.db.indexes["ACTOR_NAME"];
-            let actor1index = actorIndex.getFirstIndexOf(actor1);
-            let actor2index = actorIndex.getFirstIndexOf(actor2);
-            let recOfActor1 = UI.db.recordBySortKeyAt(
-              "ACTOR_NAME",
-              actor1index
-            );
-            let recOfActor2 = UI.db.recordBySortKeyAt(
-              "ACTOR_NAME",
-              actor2index
-            );
+            let recOfActor1 = UI.db.recordByIndexForTerm(actorIndex, actor1);
+            let recOfActor2 = UI.db.recordByIndexForTerm(actorIndex, actor2);
             let path = UI.db.findConnectionsBetweenActors(
               recOfActor1.ACTOR_ID,
               recOfActor2.ACTOR_ID
             );
+            UI.showActorConnections(path);
           }
         );
       }

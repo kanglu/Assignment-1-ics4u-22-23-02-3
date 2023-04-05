@@ -48,6 +48,13 @@ Search.show = function (keyIndex, prompt, searchCallback) {
     return;
   }
 
+  let inputContainer = document.querySelector("div.searchItems.searchInput");
+  if (!searchCallback) {
+    inputContainer.setAttribute("style", "display: none");
+  } else {
+    inputContainer.removeAttribute("style");
+  }
+
   let s = document.querySelector("div.search");
 
   let sLabel = document.querySelector("div.searchLabel");

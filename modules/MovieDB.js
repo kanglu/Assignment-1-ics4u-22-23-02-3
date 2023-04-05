@@ -566,8 +566,8 @@ class MovieDB {
    *
    * @param {Number} idx The numerical sorted index of the record.
    *
-   * @return [{String}]  An array containing all the field
-   *                     values of the corresponding record.
+   * @return {Object}  An object containing all the field
+   *                   values of the corresponding record.
    */
   recordBySortKeyAt(key, idx) {
     let r = { i: idx };
@@ -580,6 +580,47 @@ class MovieDB {
       }.bind(this)
     );
     return r;
+  }
+
+  /**
+   * This is a convenience function that returns a record for a
+   * given reference to an Index object and a string term of
+   * that index.
+   *
+   * @param {Index}  index   A reference to an Index instance.
+   *
+   * @param {String} term    A search term into that index.
+   *
+   * @return {Object}  An object containing all the field
+   *                   values of the corresponding record.
+   */
+  recordByIndexForTerm(index, term) {
+    let pos = index.getFirstIndexOf(term);
+    return this.recordBySortKeyAt(index.keyName, pos);
+  }
+
+  /**
+   * For a given Actor ID return the name of the actor.
+   *
+   * @param {String} actorID   This is the actor ID.
+   *
+   * @return {String}   The name of the actor.
+   */
+  actorNameForID(actorID) {
+    let r = this.recordByIndexForTerm(this.indexes["ACTOR_ID"], actorID);
+    return r.ACTOR_NAME;
+  }
+
+  /**
+   * For a given Film ID return the name of the film.
+   *
+   * @param {String} filmID   This is the film ID.
+   *
+   * @return {String}   The name of the film.
+   */
+  filmNameForID(filmID) {
+    let r = this.recordByIndexForTerm(this.indexes["FILM_ID"], filmID);
+    return r.FILM_NAME;
   }
 
   /**
