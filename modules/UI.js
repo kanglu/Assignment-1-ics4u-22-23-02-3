@@ -59,6 +59,10 @@ UI.start = function (db) {
 
   // Setup required settings
   UI.setupDefaults();
+  UI.search = new Search(function (foundTerm) {
+    UI.refreshTable(UI.activeIndex().getFirstIndexOf(foundTerm));
+    UI.adjustPageBar();
+  });
 
   // Setup relevant listeners
 
@@ -70,13 +74,11 @@ UI.start = function (db) {
     rzto = setTimeout(UI.fixResize, 100);
   });
 
-  document.querySelector("img#cancel").addEventListener("click", function (ev) {
-    UI.hideSearch();
-    ev.stopPropagation();
-  });
-
   document.querySelector("img#search").addEventListener("click", function (ev) {
-    UI.showSearch();
+    let keyIndex = UI.activeIndex();
+    let indexName = keyIndex.keyName;
+    let displayName = UI.displaySpec[indexName].title;
+    UI.search.show(keyIndex, `Searching for ${displayName}`);
     ev.stopPropagation();
   });
 
@@ -93,7 +95,7 @@ UI.start = function (db) {
     });
 
   document.addEventListener("wheel", function (ev) {
-    if (UI.isSearchShown()) {
+    if (UI.show.isShown()) {
       return;
     }
     UI.refreshTable(UI.curPageIndex + Math.sign(ev.deltaY) * UI.curPageSize);
@@ -159,113 +161,9 @@ UI.start = function (db) {
     }
   });
 
-  let searchTimer = null;
-  document.querySelector("input").addEventListener("keyup", function (ev) {
-    ev.stopPropagation();
-    if (ev.code == "Enter") {
-      let picks = document.querySelectorAll("div.searchPicksTable .col");
-      if (!picks || picks.length == 0) {
-        return;
-      } else {
-        // get the first term and refresh the page
-        let term = picks[0].innerText;
-        UI.hideSearch();
-        UI.refreshTable(UI.activeIndex().getFirstIndexOf(term));
-        UI.adjustPageBar();
-        return;
-      }
-    } else {
-      if (searchTimer) {
-        clearTimeout(searchTimer);
-      }
-      searchTimer = setTimeout(UI.doSearch, 200, ev.target.value, false);
-    }
-  });
-
   // Initialize the first display of data and resize the content
   // in the browser window.
   UI.fixResize();
-};
-
-UI.doSearch = function (term) {
-  searchTimer = null;
-
-  let oldPicks = document.querySelector(".searchPicksTable");
-  let newPicks = document.createElement("div");
-  newPicks.setAttribute("class", "searchPicksTable");
-
-  let matches = UI.activeIndex().search(term);
-  matches.forEach(function (val) {
-    let row = document.createElement("div");
-    row.setAttribute("class", "row");
-    let elem = document.createElement("div");
-    elem.setAttribute("class", "searchPick col");
-    elem.innerHTML = val;
-    // elem.appendChild(document.createTextNode(val));
-    row.appendChild(elem);
-    newPicks.appendChild(row);
-  });
-  oldPicks.parentElement.replaceChild(newPicks, oldPicks);
-
-  document.querySelectorAll("div.searchPicksTable .col").forEach(function (e) {
-    e.addEventListener("click", function (ev) {
-      let term = ev.target.innerText;
-      UI.hideSearch();
-      UI.refreshTable(UI.activeIndex().getFirstIndexOf(term));
-      UI.adjustPageBar();
-    });
-  });
-};
-
-UI.isSearchShown = function () {
-  let s = document.querySelector("div.search");
-  if (s.getAttribute("class") == "search searchShow") {
-    // already shown
-    return true;
-  }
-  return false;
-};
-
-UI.showSearch = function () {
-  if (UI.isSearchShown()) {
-    return;
-  }
-
-  let s = document.querySelector("div.search");
-
-  let sLabel = document.querySelector("div.searchLabel");
-  let indexName = UI.activeIndex().keyName;
-  let displayName = UI.displaySpec[indexName].title;
-  sLabel.innerHTML = `Searching for ${displayName}`;
-
-  let oldPicks = document.querySelector(".searchPicksTable");
-  oldPicks.innerHTML = "";
-
-  let w = 400;
-  let h = 500;
-  let wh = window.innerHeight;
-  let ww = window.innerWidth;
-  let top = Math.trunc((wh - h) / 2);
-  let left = Math.trunc((ww - w) / 2);
-  s.setAttribute(
-    "style",
-    `top: ${top}px; left: ${left}px; width: ${w}px; height: ${h}px;`
-  );
-
-  let rh = h - 125;
-  let sr = document.querySelector("div.searchResults");
-  sr.setAttribute("style", `height: ${rh}px; overflow-y: auto`);
-
-  s.setAttribute("class", "search searchShow");
-  let inputText = document.querySelector("input");
-  inputText.value = "";
-  inputText.focus();
-};
-
-UI.hideSearch = function () {
-  document
-    .querySelector("div.search")
-    .setAttribute("class", "search searchHide");
 };
 
 UI.switchKey = function (ev, startRowIndex = 0) {
@@ -426,7 +324,7 @@ UI.refreshTable = function (pageIndex = 0) {
 };
 
 UI.fixResize = function () {
-  UI.hideSearch();
+  UI.search.hide();
   UI.refreshTable(UI.curPageIndex);
   UI.adjustPageBar();
 };
