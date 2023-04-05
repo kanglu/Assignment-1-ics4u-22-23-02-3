@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     x="0px" y="0px" viewBox="0 0 400 400" style="background-color: #355084"
+     enable-background="new 0 0 400 400" xml:space="preserve">
+
+ <g stroke="white" fill="white" transform="scale(1.2, 1.2) translate(-90,-40)">
+  <g id="svg_4">
+   <ellipse cx="153" cy="101" id="svg_1" rx="17" ry="15" />
+   <ellipse cx="153" cy="150.5" id="svg_2" rx="28" ry="28.5" />
+   <rect height="36" width="56" x="125" y="149"/>
+  </g>
+  <g id="svg_5" transform="matrix(1 0 0 1 0 0)">
+   <ellipse cx="364" cy="123.5" id="svg_6" rx="17" ry="15" />
+   <ellipse cx="364" cy="173" id="svg_7" rx="28" ry="28.5" />
+   <rect height="36" id="svg_8" width="56" x="336" y="171.5"/>
+  </g>
+  <g id="svg_9">
+   <ellipse cx="252" cy="238.5" id="svg_10" rx="17" ry="15" />
+   <ellipse cx="252" cy="288" id="svg_11" rx="28" ry="28.5" />
+   <rect height="36" id="svg_12" width="56" x="224" y="286.5"/>
+  </g>
+
+  <path d="M 200 120 Q 270 90, 320 140" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 320 140 l -5 -15 M 320 140 l -15 0" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 360 230 Q 350 270, 300 280" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 300 280 l 8 -12 M 300 280 l 12 8" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 205 285 Q 150 250, 150 200" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 150 200 l -8 12 M 150 200 l 10 10" stroke-width="6" fill="none" stroke-linecap="round"/>
+ </g>
+</svg>
