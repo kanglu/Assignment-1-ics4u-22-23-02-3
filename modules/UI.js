@@ -59,10 +59,6 @@ UI.start = function (db) {
 
   // Setup required settings
   UI.setupDefaults();
-  UI.search = new Search(function (foundTerm) {
-    UI.refreshTable(UI.activeIndex().getFirstIndexOf(foundTerm));
-    UI.adjustPageBar();
-  });
 
   // Setup relevant listeners
 
@@ -78,7 +74,10 @@ UI.start = function (db) {
     let keyIndex = UI.activeIndex();
     let indexName = keyIndex.keyName;
     let displayName = UI.displaySpec[indexName].title;
-    UI.search.show(keyIndex, `Searching for ${displayName}`);
+    Search.show(keyIndex, `Searching for ${displayName}`, function (foundTerm) {
+      UI.refreshTable(UI.activeIndex().getFirstIndexOf(foundTerm));
+      UI.adjustPageBar();
+    });
     ev.stopPropagation();
   });
 
@@ -95,7 +94,7 @@ UI.start = function (db) {
     });
 
   document.addEventListener("wheel", function (ev) {
-    if (UI.search.isShown()) {
+    if (Search.isShown()) {
       return;
     }
     UI.refreshTable(UI.curPageIndex + Math.sign(ev.deltaY) * UI.curPageSize);
@@ -291,6 +290,41 @@ UI.adjustPageBar = function () {
   );
 };
 
+UI.addActorLinksBinding = function () {
+  document.querySelector("img#links").addEventListener("click", function (ev) {
+    Search.show(
+      UI.db.indexes["ACTOR_NAME"],
+      `Actor Connection: Pick the first actor:`,
+      function (pick) {
+        let actor1 = pick;
+        Search.show(
+          UI.db.indexes["ACTOR_NAME"],
+          "Actor Connection: Pick the second actor:",
+          function (pick) {
+            let actor2 = pick;
+            let actorIndex = UI.db.indexes["ACTOR_NAME"];
+            let actor1index = actorIndex.getFirstIndexOf(actor1);
+            let actor2index = actorIndex.getFirstIndexOf(actor2);
+            let recOfActor1 = UI.db.recordBySortKeyAt(
+              "ACTOR_NAME",
+              actor1index
+            );
+            let recOfActor2 = UI.db.recordBySortKeyAt(
+              "ACTOR_NAME",
+              actor2index
+            );
+            let path = UI.db.findConnectionsBetweenActors(
+              recOfActor1.ACTOR_ID,
+              recOfActor2.ACTOR_ID
+            );
+          }
+        );
+      }
+    );
+    ev.stopPropagation();
+  });
+};
+
 UI.refreshTable = function (pageIndex = 0) {
   if (pageIndex < 0) {
     pageIndex = 0;
@@ -332,11 +366,13 @@ UI.refreshTable = function (pageIndex = 0) {
     }
   }
 
+  UI.addActorLinksBinding();
+
   UI.curPageIndex = pageIndex;
 };
 
 UI.fixResize = function () {
-  UI.search.hide();
+  Search.hide();
   UI.refreshTable(UI.curPageIndex);
   UI.adjustPageBar();
 };
