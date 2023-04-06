@@ -379,10 +379,19 @@ UI.showActorConnections = function (path) {
   let newPicks = document.createElement("div");
   newPicks.setAttribute("class", "searchPicksTable");
 
-  // Spacer row
+  // Show number of connections
   let row = document.createElement("div");
   row.setAttribute("class", "row");
   let elem = document.createElement("div");
+  elem.setAttribute("class", "searchPick col");
+  elem.innerHTML = `Connections: ${path.length}`;
+  row.appendChild(elem);
+  newPicks.appendChild(row);
+
+  // Spacer row
+  row = document.createElement("div");
+  row.setAttribute("class", "row");
+  elem = document.createElement("div");
   elem.setAttribute("class", "searchPick col");
   elem.innerHTML = "&nbsp;";
   row.appendChild(elem);
