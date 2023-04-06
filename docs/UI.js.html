@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: UI.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: UI.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * This AssignmentUI module containing a single UI class with
  * static methods that performs the majority of the UI logic.
  *
@@ -230,13 +258,13 @@ UI.addHeaderRow = function (table) {
 
     let icon = "";
     if (ck == "ACTOR_NAME") {
-      icon = '<img src="links.svg" width="25px" height="25px" id="links"/>';
+      icon = '&lt;img src="links.svg" width="25px" height="25px" id="links"/>';
     }
 
     elem.innerHTML =
-      `<div style="display:flex; margin: 0; pading: 0;` +
+      `&lt;div style="display:flex; margin: 0; pading: 0;` +
       `flex-direction: row; column-gap: 10px; align-items: baseline;">` +
-      `${icon}<div>${spec.title}</div></div>`;
+      `${icon}&lt;div>${spec.title}&lt;/div>&lt;/div>`;
 
     rowElem.appendChild(elem);
 
@@ -263,9 +291,9 @@ UI.addRecordRow = function (table, r) {
     elem.index = UI.db.indexes[ck];
     let text = r[ck];
     if (ck == "FILM_ID") {
-      text = `<a href="https://www.imdb.com/title/${text}/" target="_blank">${text}</a>`;
+      text = `&lt;a href="https://www.imdb.com/title/${text}/" target="_blank">${text}&lt;/a>`;
     } else if (ck == "ACTOR_ID") {
-      text = `<a href="https://www.imdb.com/name/${text}/" target="_blank">${text}</a>`;
+      text = `&lt;a href="https://www.imdb.com/name/${text}/" target="_blank">${text}&lt;/a>`;
     }
 
     elem.setAttribute("class", "col" + (i > 0 ? " clickable" : ""));
@@ -273,7 +301,7 @@ UI.addRecordRow = function (table, r) {
 
     rowElem.appendChild(elem);
 
-    if (i > 0 && ck != "FILM_ID" && ck != "ACTOR_ID") {
+    if (i > 0 &amp;&amp; ck != "FILM_ID" &amp;&amp; ck != "ACTOR_ID") {
       elem.addEventListener("click", function (ev) {
         let term = ev.target.innerText;
         UI.switchKey(ev, elem.index.getFirstIndexOf(term), elem.index);
@@ -399,7 +427,7 @@ UI.showActorConnections = function (path) {
   row.setAttribute("class", "row");
   elem = document.createElement("div");
   elem.setAttribute("class", "searchPick col");
-  elem.innerHTML = "&nbsp;";
+  elem.innerHTML = "&amp;nbsp;";
   row.appendChild(elem);
   newPicks.appendChild(row);
 
@@ -437,9 +465,9 @@ UI.addActorLinksBinding = function () {
         let actor1 = pick;
         Search.show(
           UI.db.indexes["ACTOR_NAME"],
-          `<div style="line-height:1.5em">Actor Connection:</div>` +
-            `<div style="line-height:1.5em"><span style="color: yellow">${actor1}</span> chosen;</div>` +
-            `<div>Please pick the second actor:</div>`,
+          `&lt;div style="line-height:1.5em">Actor Connection:&lt;/div>` +
+            `&lt;div style="line-height:1.5em">&lt;span style="color: yellow">${actor1}&lt;/span> chosen;&lt;/div>` +
+            `&lt;div>Please pick the second actor:&lt;/div>`,
           function (pick) {
             let actor2 = pick;
             let actorIndex = UI.db.indexes["ACTOR_NAME"];
@@ -459,7 +487,7 @@ UI.addActorLinksBinding = function () {
 };
 
 UI.refreshTable = function (pageIndex = 0) {
-  if (pageIndex < 0) {
+  if (pageIndex &lt; 0) {
     pageIndex = 0;
   }
   if (pageIndex > UI.db.numOfRecords() - UI.curPageSize) {
@@ -483,7 +511,7 @@ UI.refreshTable = function (pageIndex = 0) {
 
   UI.addHeaderRow(newTable);
 
-  for (let i = pageIndex; i < pageIndex + UI.curPageSize; i++) {
+  for (let i = pageIndex; i &lt; pageIndex + UI.curPageSize; i++) {
     let r = UI.db.recordBySortKeyAt(sortKey, i);
     UI.addRecordRow(newTable, r);
   }
@@ -491,8 +519,8 @@ UI.refreshTable = function (pageIndex = 0) {
   oldTable.parentElement.replaceChild(newTable, oldTable);
 
   let allRows = document.querySelectorAll(".row");
-  if (allRows && allRows.length > 0) {
-    for (let i = 0; i < allRows.length; i++) {
+  if (allRows &amp;&amp; allRows.length > 0) {
+    for (let i = 0; i &lt; allRows.length; i++) {
       if (allRows[i].offsetTop + allRows[i].clientHeight > wh) {
         allRows[i].remove();
       }
@@ -519,7 +547,7 @@ UI.movePageThumb = function (delta) {
   let minTop = tb.children[0].clientHeight;
   let maxTop = minTop + pb.clientHeight - pt.clientHeight;
   let newTop = UI.oldTop + delta;
-  if (newTop < minTop) {
+  if (newTop &lt; minTop) {
     newTop = minTop;
   }
   if (newTop > maxTop) {
@@ -546,3 +574,26 @@ UI.refreshTableBasedOnThumb = function () {
     )
   );
 };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Assignment.html">Assignment</a></li><li><a href="module-AssignmentUI.html">AssignmentUI</a></li></ul><h3>Classes</h3><ul><li><a href="module-Assignment-Index.html">Index</a></li><li><a href="module-Assignment-MovieDB.html">MovieDB</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Apr 06 2023 18:15:10 GMT-0400 (Eastern Daylight Saving Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
