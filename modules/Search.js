@@ -109,6 +109,12 @@ Search.doSearch = function (term) {
   });
   oldPicks.parentElement.replaceChild(newPicks, oldPicks);
 
+  // recalculate the height of the pick table container
+  let ss = document.querySelector(".searchShow").clientHeight;
+  let sr = document.querySelector(".searchResults");
+  let nh = ss - sr.offsetTop - 20;
+  sr.style.height = `${nh}px`;
+
   document.querySelectorAll("div.searchPicksTable .col").forEach(function (e) {
     e.addEventListener("click", function (ev) {
       let term = ev.target.innerText;

@@ -165,25 +165,40 @@ UI.start = function (db) {
   UI.fixResize();
 };
 
-UI.switchKey = function (ev, startRowIndex = 0) {
-  let index = ev.target.parentElement.parentElement.index;
-  let curIndex = ev.target.parentElement.parentElement.curOrderIndex;
-  if (!index) {
-    // Can also come from a non-header column click
-    index = ev.target.index;
-    curIndex = ev.target.curOrderIndex;
+UI.gotoKeyItem = function (keyName, posIndex, value, closeSearch = true) {
+  let startRowIndex = 0;
+  if (posIndex) {
+    startRowIndex = posIndex;
   }
+  if (value) {
+    startRowIndex = UI.db.indexes[keyName].getFirstIndexOf(value);
+  }
+
+  let curIndex = UI.displaySpec.order.indexOf(keyName, 0);
+
+  UI.displaySpec.order.splice(curIndex, 1);
+  UI.displaySpec.order.splice(0, 0, keyName);
+
+  UI.curPageIndex = startRowIndex;
+  UI.fixResize(closeSearch);
+};
+
+UI.switchKey = function (ev, startRowIndex = 0, givenIndex) {
+  let index = givenIndex;
+  if (!index) {
+    index = ev.target.parentElement.parentElement.index;
+    if (!index) {
+      // Can also come from a non-header column click
+      index = ev.target.index;
+    }
+  }
+
   let name = index.keyName;
   if (!index.isReady()) {
     console.log(`${name} index is not ready yet! Try again later.`);
     return;
   }
-
-  UI.displaySpec.order.splice(curIndex, 1);
-  UI.displaySpec.order.splice(0, 0, name);
-
-  UI.curPageIndex = startRowIndex;
-  UI.fixResize();
+  UI.gotoKeyItem(name, startRowIndex);
 };
 
 UI.addHeaderRow = function (table) {
@@ -201,7 +216,6 @@ UI.addHeaderRow = function (table) {
     let spec = UI.displaySpec[ck];
     let elem = document.createElement("div");
     elem.index = UI.db.indexes[ck];
-    elem.curOrderIndex = i;
     elem.setAttribute("class", "header");
     elem.setAttribute(
       "style",
@@ -251,13 +265,12 @@ UI.addRecordRow = function (table, r) {
     elem.setAttribute("class", "col" + (i > 0 ? " clickable" : ""));
     elem.innerHTML = text;
 
-    elem.curOrderIndex = i;
     rowElem.appendChild(elem);
 
     if (i > 0 && ck != "FILM_ID" && ck != "ACTOR_ID") {
       elem.addEventListener("click", function (ev) {
         let term = ev.target.innerText;
-        UI.switchKey(ev, elem.index.getFirstIndexOf(term));
+        UI.switchKey(ev, elem.index.getFirstIndexOf(term), elem.index);
       });
     }
   });
@@ -293,6 +306,71 @@ UI.adjustPageBar = function () {
   );
 };
 
+UI.createFilmNodeRow = function (film) {
+  let row = document.createElement("div");
+  row.setAttribute("class", "row");
+  let elem = document.createElement("div");
+  elem.setAttribute("class", "searchPick col");
+  let filmElem = document.createElement("div");
+  filmElem.setAttribute("class", "filmNode");
+
+  let filmLine = document.createElement("div");
+  filmLine.setAttribute("class", "filmLine");
+  filmLine.appendChild(document.createTextNode(" "));
+  filmElem.appendChild(filmLine);
+
+  let filmBox = document.createElement("div");
+  filmBox.setAttribute("class", "filmBox");
+  filmBox.appendChild(document.createTextNode(film));
+  filmElem.appendChild(filmBox);
+
+  elem.appendChild(filmElem);
+  row.appendChild(elem);
+
+  filmBox.addEventListener("click", function (ev) {
+    // temporary move the popup to the upper right corner
+    let spopup = document.querySelector(".search");
+    spopup.style.top = "10px";
+    spopup.style.left = null;
+    spopup.style.right = "10px";
+    let term = ev.target.innerText;
+
+    // refresh the table with new context
+    UI.gotoKeyItem("FILM_NAME", null, term, false);
+  });
+  return row;
+};
+
+UI.createActorNodeRow = function (actor) {
+  let row = document.createElement("div");
+  row.setAttribute("class", "row");
+  let elem = document.createElement("div");
+  elem.setAttribute("class", "searchPick col");
+  let actorElem = document.createElement("div");
+  actorElem.setAttribute("class", "actorNode");
+
+  let actorBox = document.createElement("div");
+  actorBox.setAttribute("class", "actorBox");
+  actorBox.appendChild(document.createTextNode(actor));
+  actorElem.appendChild(actorBox);
+
+  elem.appendChild(actorElem);
+  row.appendChild(elem);
+
+  actorElem.addEventListener("click", function (ev) {
+    // temporary move the popup to the upper right corner
+    let spopup = document.querySelector(".search");
+    spopup.style.top = "10px";
+    spopup.style.left = null;
+    spopup.style.right = "10px";
+    let term = ev.target.innerText;
+
+    // refresh the table with new context
+    UI.gotoKeyItem("ACTOR_NAME", null, term, false);
+  });
+  return row;
+};
+
 UI.showActorConnections = function (path) {
   // Too lazy - repurpose the Search dialog.
   Search.show(null, "Connection Results:");
@@ -300,6 +378,15 @@ UI.showActorConnections = function (path) {
   let oldPicks = document.querySelector(".searchPicksTable");
   let newPicks = document.createElement("div");
   newPicks.setAttribute("class", "searchPicksTable");
+
+  // Spacer row
+  let row = document.createElement("div");
+  row.setAttribute("class", "row");
+  let elem = document.createElement("div");
+  elem.setAttribute("class", "searchPick col");
+  elem.innerHTML = "&nbsp;";
+  row.appendChild(elem);
+  newPicks.appendChild(row);
 
   if (path.length == 0) {
     let row = document.createElement("div");
@@ -310,26 +397,17 @@ UI.showActorConnections = function (path) {
     row.appendChild(elem);
     newPicks.appendChild(row);
   } else {
-    path.reverse().forEach(function (node) {
-      let row = document.createElement("div");
-      row.setAttribute("class", "row");
-      let elem = document.createElement("div");
-      elem.setAttribute("class", "searchPick col");
-      let fromActorName = UI.db.actorNameForID(node.fromActor);
-      let toActorName = UI.db.actorNameForID(node.actor);
+    path.reverse().forEach(function (node, i) {
+      if (i == 0) {
+        let fromActorName = UI.db.actorNameForID(node.fromActor);
+        newPicks.appendChild(UI.createActorNodeRow(fromActorName));
+      }
+
       let filmName = UI.db.filmNameForID(node.film);
-      //!!TODO draw a nicer version of the connection graph!
-      let fromActorElem = document.createElement("div");
-      let toActorElem = document.createElement("div");
-      let filmElem = document.createElement("div");
-      fromActorElem.appendChild(document.createTextNode(fromActorName));
-      toActorElem.appendChild(document.createTextNode(toActorName));
-      filmElem.appendChild(document.createTextNode(filmName));
-      elem.appendChild(fromActorElem);
-      elem.appendChild(toActorElem);
-      elem.appendChild(filmElem);
-      row.appendChild(elem);
-      newPicks.appendChild(row);
+      newPicks.appendChild(UI.createFilmNodeRow(filmName));
+
+      let toActorName = UI.db.actorNameForID(node.actor);
+      newPicks.appendChild(UI.createActorNodeRow(toActorName));
     });
   }
   oldPicks.parentElement.replaceChild(newPicks, oldPicks);
@@ -411,8 +489,10 @@ UI.refreshTable = function (pageIndex = 0) {
   UI.curPageIndex = pageIndex;
 };
 
-UI.fixResize = function () {
-  Search.hide();
+UI.fixResize = function (closeSearch = true) {
+  if (closeSearch) {
+    Search.hide();
+  }
   UI.refreshTable(UI.curPageIndex);
   UI.adjustPageBar();
 };
