@@ -230,7 +230,8 @@ UI.addHeaderRow = function (table) {
 
     let icon = "";
     if (ck == "ACTOR_NAME") {
-      icon = '<img src="links.svg" width="25px" height="25px" id="links"/>';
+      icon =
+        '<img src="images/links.svg" width="25px" height="25px" id="links"/>';
     }
 
     elem.innerHTML =
