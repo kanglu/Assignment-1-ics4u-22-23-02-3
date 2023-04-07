@@ -149,7 +149,7 @@ access the original data categories of the JSON.</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line524">line 524</a>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line525">line 525</a>
     </li></ul></dd>
     
 
@@ -306,7 +306,7 @@ access the original data categories of the JSON.</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line619">line 619</a>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line620">line 620</a>
     </li></ul></dd>
     
 
@@ -467,7 +467,7 @@ for later access. The sorting is mostly lazily performed.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line561">line 561</a>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line562">line 562</a>
     </li></ul></dd>
     
 
@@ -604,7 +604,7 @@ for later access. The sorting is mostly lazily performed.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line631">line 631</a>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line632">line 632</a>
     </li></ul></dd>
     
 
@@ -662,7 +662,7 @@ for later access. The sorting is mostly lazily performed.
     
 
     
-    <h4 class="name" id="findSameCastForActor"><span class="type-signature"></span>findSameCastForActor<span class="signature">(baseActor, seekActor)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="findAllMoviesByActors"><span class="type-signature"></span>findAllMoviesByActors<span class="signature">(A)</span><span class="type-signature"> &rarr; {Set.&lt;string>}</span></h4>
     
 
     
@@ -670,8 +670,568 @@ for later access. The sorting is mostly lazily performed.
 
 
 <div class="description">
-    Do a breadth first search on all common movies between the base
-actor and the seek actor.
+    Find all the movies that an actor has performed in.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>A</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Set.&lt;string></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">set of actors (ACTOR_ID)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line719">line 719</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A set of unique film id's
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Set.&lt;string></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="findConnectionsBetweenActors"><span class="type-signature"></span>findConnectionsBetweenActors<span class="signature">(baseActor, seekActor)</span><span class="type-signature"> &rarr; {Array.&lt;Object>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    This is the main entry point for finding a complete path
+between two actors via intermediary actors and the common
+films that they have made together.
+
+It uses the function findPathToActor to find an intermediary
+actor that is directly connected to the seekActor, and
+then repeat the technique from the baseActor to the
+intermediary actor, until the intermediary actor is the
+baseActor.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>baseActor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The actor id of the base actor.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>seekActor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The actor id of the actor we want
+                          to seek a path to.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line797">line 797</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An array of object, where each object
+                          represent a connection between two
+                          actors and a corresponding film. The
+                          array therefore represents a path of
+                          interconnecting films and actors, from
+                          the baseActor to the seekActor.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;Object></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="findPathToActor"><span class="type-signature"></span>findPathToActor<span class="signature">(baseActor, seekActor)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Use the findSameCastForActor function to obtain a match of the
+baseActor or one of the intermediary actors using breadth first
+traversal of common films. We either find a direct match between
+two actors and a film, or terminate due to no more films or
+actors to be processed. The baseActor may not be one of the two
+actors, since it can be an intermediary actor.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>baseActor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The actor id of the base actor.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>seekActor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The actor id of the actor we want
+                          to seek a path to.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line751">line 751</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Same as the function findSameCastForActor,
+                 but either only the successful case, or with
+                 an empty actors set.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="findSameCastForActor"><span class="type-signature"></span>findSameCastForActor<span class="signature">(baseActor, seekActor, doneMovies)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Attempt to search for the seekActor from all the movies that the
+baseActor made. Failure to do so, we will return all the co-cast
+members of all the movies of the baseActor.
+
+<pre><code>
+   {
+     found: true, fromActor: actor_id,
+     film: film_id, actor: seek_actor_id
+   }
+
+                     OR
+
+   {
+     found: false,
+     actors: Set of actors
+   }
+   </code></pre>
 </div>
 
 
@@ -750,6 +1310,30 @@ actor and the seek actor.
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>doneMovies</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Set.&lt;string></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">This is a set of unique film ids that
+                     have already been processed.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -787,7 +1371,7 @@ actor and the seek actor.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line657">line 657</a>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line675">line 675</a>
     </li></ul></dd>
     
 
@@ -816,8 +1400,7 @@ actor and the seek actor.
 
         
 <div class="param-desc">
-    { found: true, film: film_id, mactor } OR
-                   { found: false, actors: Set of actors } }
+    See description.
 </div>
 
 
@@ -898,7 +1481,7 @@ actor and the seek actor.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line642">line 642</a>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line643">line 643</a>
     </li></ul></dd>
     
 
@@ -1083,7 +1666,7 @@ that index.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line607">line 607</a>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line608">line 608</a>
     </li></ul></dd>
     
 
@@ -1268,7 +1851,7 @@ of a specific database key.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line582">line 582</a>
+        <a href="MovieDB.js.html">MovieDB.js</a>, <a href="MovieDB.js.html#line583">line 583</a>
     </li></ul></dd>
     
 
@@ -1343,7 +1926,7 @@ of a specific database key.
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 07 2023 15:00:54 GMT-0400 (Eastern Daylight Saving Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 07 2023 16:28:28 GMT-0400 (Eastern Daylight Saving Time)
 </footer>
 
 <script> prettyPrint(); </script>

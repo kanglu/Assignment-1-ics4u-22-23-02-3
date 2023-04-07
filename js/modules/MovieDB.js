@@ -403,7 +403,7 @@ class Index {
    *                      This element is ignored if the "from" parameter
    *                      is an array.
    *
-   * @return An array of values from the index range.
+   * @return {string[]}   An array of values from the index range.
    */
   rangeValues(from, to) {
     let start = from;
@@ -512,7 +512,8 @@ class Index {
 }
 
 /**
- * @A time tag indicating when we started the application.
+ * @constant {double} appStart  A time tag indicating when we started the
+ * application in millisecond resolution.
  */
 const appStart = performance.now();
 
@@ -644,15 +645,32 @@ class MovieDB {
   }
 
   /**
-   * Do a breadth first search on all common movies between the base
-   * actor and the seek actor.
+   * Attempt to search for the seekActor from all the movies that the
+   * baseActor made. Failure to do so, we will return all the co-cast
+   * members of all the movies of the baseActor.
+   *
+   * <pre><code>
+   *    {
+   *      found: true, fromActor: actor_id,
+   *      film: film_id, actor: seek_actor_id
+   *    }
+   *
+   *                      OR
+   *
+   *    {
+   *      found: false,
+   *      actors: Set of actors
+   *    }
+   *    </code></pre>
    *
    * @param {string} baseActor  This is the ACTOR_ID of the base actor.
    *
    * @param {string} seekActor  This is the ACTOR_ID of the seek actor.
    *
-   * @return {Object}   { found: true, film: film_id, mactor } OR
-   *                    { found: false, actors: Set of actors } }
+   * @param {Set<string>}  doneMovies This is a set of unique film ids that
+   *                      have already been processed.
+   *
+   * @return {Object} See description.
    */
   findSameCastForActor(baseActor, seekActor, doneMovies) {
     let actorIndex = this.indexes["ACTOR_ID"];
@@ -691,6 +709,13 @@ class MovieDB {
     return { found: false, actors: uniqActors };
   }
 
+  /**
+   * Find all the movies that an actor has performed in.
+   *
+   * @param  {Set<string>}  A set of actors (ACTOR_ID)
+   *
+   * @return {Set<string>} A set of unique film id's
+   */
   findAllMoviesByActors(actors) {
     let films = new Set();
     let actorIndex = this.indexes["ACTOR_ID"];
@@ -706,6 +731,23 @@ class MovieDB {
     return films;
   }
 
+  /**
+   * Use the findSameCastForActor function to obtain a match of the
+   * baseActor or one of the intermediary actors using breadth first
+   * traversal of common films. We either find a direct match between
+   * two actors and a film, or terminate due to no more films or
+   * actors to be processed. The baseActor may not be one of the two
+   * actors, since it can be an intermediary actor.
+   *
+   * @param {string} baseActor The actor id of the base actor.
+   *
+   * @param {string} seekActor The actor id of the actor we want
+   *                           to seek a path to.
+   *
+   * @return {Object} Same as the function findSameCastForActor,
+   *                  but either only the successful case, or with
+   *                  an empty actors set.
+   */
   findPathToActor(baseActor, seekActor) {
     let doneMovies = new Set();
     let r = this.findSameCastForActor(baseActor, seekActor, doneMovies);
@@ -729,6 +771,30 @@ class MovieDB {
     return r;
   }
 
+  /**
+   * This is the main entry point for finding a complete path
+   * between two actors via intermediary actors and the common
+   * films that they have made together.
+   *
+   * It uses the function findPathToActor to find an intermediary
+   * actor that is directly connected to the seekActor, and
+   * then repeat the technique from the baseActor to the
+   * intermediary actor, until the intermediary actor is the
+   * baseActor.
+   *
+   * @param {string} baseActor The actor id of the base actor.
+   *
+   * @param {string} seekActor The actor id of the actor we want
+   *                           to seek a path to.
+   *
+   * @return {Array<Object>}   An array of objects where each object
+   *                           represent a connection between two
+   *                           actors and a corresponding film --
+   *                           successful case of findSameCastForActor.
+   *                           The array therefore represents a path of
+   *                           interconnecting films and actors, from
+   *                           the baseActor to the seekActor.
+   */
   findConnectionsBetweenActors(baseActor, seekActor) {
     let finalPath = [];
 
