@@ -78,12 +78,13 @@ UI.start = function (db) {
 
   document.querySelector("img#search").addEventListener("click", function (ev) {
     let keyIndex = UI.activeIndex();
-    let indexName = keyIndex.keyName;
-    let displayName = UI.displaySpec[indexName].title;
-    Search.show(keyIndex, `Searching for ${displayName}`, function (foundTerm) {
-      UI.refreshTable(UI.activeIndex().getFirstIndexOf(foundTerm));
-      UI.adjustPageBar();
+    Search.show(keyIndex, null, function (foundTerm) {
+      let select = document.querySelector("#findIndex");
+      let keyName = select.options[select.selectedIndex].value;
+
+      UI.gotoKeyItem(keyName, null, foundTerm, true);
     });
+
     ev.stopPropagation();
   });
 
@@ -192,11 +193,7 @@ UI.gotoKeyItem = function (keyName, posIndex, value, closeSearch = true) {
 UI.switchKey = function (ev, startRowIndex = 0, givenIndex) {
   let index = givenIndex;
   if (!index) {
-    index = ev.target.parentElement.parentElement.index;
-    if (!index) {
-      // Can also come from a non-header column click
-      index = ev.target.index;
-    }
+    index = ev.currentTarget.index;
   }
 
   let name = index.keyName;
