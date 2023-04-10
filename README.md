@@ -1,31 +1,46 @@
-# Instructions
+<style>
+  p {font-size: 150%;}
+</style>
 
-### Intro
+I've been working on customizing my Neovim setup for quite sometime now,
+and I have been itching for a project that I can hone in my keyboard skills
+and muscle memory of this text editor. One evening, my son and I were
+discussing merge sort and how the algorithm can be augmented without changing
+the original data elements. He told me it was part of his new
+[assignment](../lesson/instructions.pdf).
 
-Around 1000 movies are released each year, with each containing around 10 main and supporting characters. IMDb is an online database of information related to films and other mediums of entertainment. Over the years, they have collected thousands of entries on actors alone. 
-### Your Task
-Create a GUI to :
-Allow your users to search for actors based on the actor’s full name or actorID. 
-Users can also search for films using the film’s name, filmID or the year it was released
-Display your search results on the screen. If an actor was searched, display all the films they were in along with the film’s release dates. Each film is displayed one by one.
-If a film was searched, display which year it was released, its rating, number of votes from users, and all the actors that participated in the film.
-Users can search for results in lower case, upper case, or all caps. If no search results show up then display an error message.
-Have a second page where all the information is listed in tabular form.
-The table can be sorted by each of the 7 categories (ascending or descending)
+Long story short, I decided this assignment would be a good trial for my new
+Neovim setup. Not going to lie. I think I was more excited than my son on
+this assignment.
 
+I created my merge sort, debugging it using Neovim, and its corresponding
+`nivm-dap-vscode-js` DAP adapter plugin, and the `vscode-js-debug`. The
+experience was okay and on par with Visual Studio Code on the same HW
+platform. However, I liked the fact that I was able to debug it even
+through `ssh`.
 
-Your program must perform searches and sorts as quickly as possible
-Provide the asymptotic bound for each of the functions.
-Every time your application performs an action (such as searching), use performance.now() to record the time it takes to complete the action. Display this number back to the user. 
+As the old saying goes, no software project is ever completed, we just know
+when to stop. I decided to end my exploration of Neovim here, culminated in
+this little handy [web site](../) that can explore the IMDB data quite
+nicely. I especially liked my visual interpretation of the Six Degrees of
+Kevin Bacon. I did not follow the instructions verbatim, rather applied the
+spirit of the original requirements and applied my own interpretation of the
+look and feel of the final rendition.
 
-### Bonus 1 (+ 1%) - Alpha Omega
-Users can search for actors using their first or last name as well. They do not have to select another category when searching to do so. The program should know when a search is not a full name. If multiple actors share the same name, first provide a list of results with that name.
+I skipped the **Hit List** concept, as I thought without a proper persistent backend,
+the user could have simply used the browser bookmarks to the end IMDB links
+which are way more resourceful than anything I could cook up in the
+short term.
 
-### Bonus 2 (+ 4%) - Hit List
-Users can login. When they are logged it, they can create a favourite actors list, and a favourite films list. 
+I put some source code documentation on my **Merge Sort** and **Searching**
+algorithms. I also commented on my technique of the **Actor Connection**
+algorithm. All of which were inlined with JSDOC and can be accessed with
+the menu on the right of this page.
 
-### Bonus 3 (+ 5%) - 6 Degrees of Kevin Bacon
-https://en.wikipedia.org/wiki/Six_Degrees_of_Kevin_Bacon#:~:text=Six%20Degrees%20of%20Kevin%20Bacon%20or%20Bacon's%20Law%20is%20a,ultimately%20leads%20to%20prolific%20American
+Here is a quick demo of its navigation and capabilities:
 
-Create a function where users can search for two actors and it returns the shortest number of jumps via movies until the two actors are linked to one another. An actor to themselves would be a jump (or Bacon number) of 0. Neither actor has to be Kevin Bacon.
-
+<iframe width="800" height="450"
+  src="https://www.youtube.com/embed/kswen_UclCw"
+  title="YouTube video player" frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowfullscreen></iframe>
