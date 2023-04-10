@@ -35,7 +35,8 @@ short term.
 I put some source code documentation on my **Merge Sort** and **Searching**
 algorithms. I also commented on my technique of the **Actor Connection**
 algorithm. All of which were inlined with JSDOC and can be accessed with
-the menu on the right of this page.
+the menu on the right of this page. The full code is available on
+[GitHub](https://kanglu.github.io/Assignment-1-ics4u-22-23-02-3/).
 
 Here is a quick demo of its navigation and capabilities:
 
