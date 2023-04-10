@@ -21,8 +21,9 @@ through `ssh`.
 
 As the old saying goes, no software project is ever completed, we just know
 when to stop. I decided to end my exploration of Neovim here, culminated in
-this little handy [web site](../) that can explore the IMDB data quite
-nicely. I especially liked my visual interpretation of the Six Degrees of
+this little handy [web site](https://kanglu.github.io/Assignment-1-ics4u-22-23-02-3/)
+that can explore the IMDB data quite nicely.
+I especially liked my visual interpretation of the Six Degrees of
 Kevin Bacon. I did not follow the instructions verbatim, rather applied the
 spirit of the original requirements and applied my own interpretation of the
 look and feel of the final rendition.
@@ -36,7 +37,7 @@ I put some source code documentation on my **Merge Sort** and **Searching**
 algorithms. I also commented on my technique of the **Actor Connection**
 algorithm. All of which were inlined with JSDOC and can be accessed with
 the menu on the right of this page. The full code is available on
-[GitHub](https://kanglu.github.io/Assignment-1-ics4u-22-23-02-3/).
+[GitHub](https://github.com/kanglu/Assignment-1-ics4u-22-23-02-3).
 
 Here is a quick demo of its navigation and capabilities:
 
