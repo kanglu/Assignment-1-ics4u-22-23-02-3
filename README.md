@@ -42,7 +42,8 @@ the menu on the right of this page. The full code is available on
 Here is a quick demo of its navigation and capabilities:
 
 <iframe width="800" height="450"
-  src="https://www.youtube.com/embed/kswen_UclCw"
-  title="YouTube video player" frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-  allowfullscreen></iframe>
+    src="https://www.youtube.com/embed/9ni1A8zfnMM"
+    title="YouTube video player" frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen>
+</iframe>
